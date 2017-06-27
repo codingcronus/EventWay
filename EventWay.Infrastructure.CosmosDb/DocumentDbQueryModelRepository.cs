@@ -1,0 +1,171 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
+using EventWay.Query;
+using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Client.TransientFaultHandling;
+using Microsoft.Azure.Documents.Linq;
+using Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling;
+
+namespace EventWay.Infrastructure.CosmosDb
+{
+    public class DocumentDbQueryModelRepository : IQueryModelRepository
+    {
+        private readonly string _databaseId;
+        private readonly string _collectionId;
+        //private readonly IReliableReadWriteDocumentClient _client;
+        private readonly DocumentClient _client;
+
+        public DocumentDbQueryModelRepository(string database, string collection, string endpoint, string authKey)
+        {
+            _databaseId = database;
+            _collectionId = collection;
+
+            _client = new DocumentClient(new Uri(endpoint), authKey,
+                new ConnectionPolicy
+                {
+                    EnableEndpointDiscovery = false
+                }
+            );
+            //.AsReliable(new FixedInterval(10, TimeSpan.FromSeconds(1)));
+        }
+
+        public void Initialize()
+        {
+            CreateDatabaseIfNotExistsAsync().Wait();
+            CreateCollectionIfNotExistsAsync().Wait();
+        }
+
+        public async Task<T> GetById<T>(Guid id) where T : QueryModel
+        {
+            try
+            {
+                var modelId = typeof(T).Name + "-" + id;
+
+                Document document = await _client.ReadDocumentAsync(GetDocumentUri(modelId));
+                return (T)(dynamic)document;
+            }
+            catch (DocumentClientException e)
+            {
+                if (e.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    return null;
+
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<T>> GetAll<T>() where T : QueryModel
+        {
+            var query = _client.CreateDocumentQuery<T>(
+                GetCollectionUri(),
+                new FeedOptions { MaxItemCount = -1 })
+                .Where(x => x.Type == typeof(T).Name)
+                .AsDocumentQuery();
+
+            var results = new List<T>();
+            while (query.HasMoreResults)
+            {
+                results.AddRange(await query.ExecuteNextAsync<T>());
+            }
+
+            return results;
+        }
+
+        public async Task<IEnumerable<T>> GetAll<T>(Expression<Func<T, bool>> predicate) where T : QueryModel
+        {
+            var query = _client.CreateDocumentQuery<T>(
+                GetCollectionUri(),
+                new FeedOptions { MaxItemCount = -1 })
+                .Where(x => x.Type == typeof(T).Name)
+                .Where(predicate)
+                .AsDocumentQuery();
+
+            var results = new List<T>();
+            while (query.HasMoreResults)
+            {
+                results.AddRange(await query.ExecuteNextAsync<T>());
+            }
+
+            return results;
+        }
+
+        public async Task<T> QueryItemAsync<T>(Expression<Func<T, bool>> predicate) where T : QueryModel
+        {
+            var query = _client.CreateDocumentQuery<T>(
+                GetCollectionUri(),
+                new FeedOptions { MaxItemCount = 1 })
+                .Where(x => x.Type == typeof(T).Name)
+                .Where(predicate)
+                .AsDocumentQuery();
+
+            if (query.HasMoreResults)
+            {
+                //var dynamicResult = await (dynamic)query.ExecuteNextAsync().Result;
+                
+                //var results = (T) dynamicResults;
+
+                var results = await query.ExecuteNextAsync<T>();
+
+                return results.FirstOrDefault<T>();
+            }
+
+            return null;
+        }
+
+        public async Task Save(QueryModel queryModel)
+        {
+            await _client.UpsertDocumentAsync(GetCollectionUri(), queryModel, null, disableAutomaticIdGeneration: true);
+        }
+
+        // Utility Methods
+        private async Task CreateDatabaseIfNotExistsAsync()
+        {
+            try
+            {
+                await _client.ReadDatabaseAsync(UriFactory.CreateDatabaseUri(_databaseId));
+            }
+            catch (DocumentClientException e)
+            {
+                if (e.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    await _client.CreateDatabaseAsync(new Database { Id = _databaseId });
+                else
+                    throw;
+            }
+        }
+
+        private async Task CreateCollectionIfNotExistsAsync()
+        {
+            try
+            {
+                await _client.ReadDocumentCollectionAsync(GetCollectionUri());
+            }
+            catch (DocumentClientException e)
+            {
+                if (e.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    await _client.CreateDocumentCollectionAsync(
+                        UriFactory.CreateDatabaseUri(_databaseId),
+                        new DocumentCollection { Id = _collectionId },
+                        new RequestOptions { OfferThroughput = 1000 });
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+        private Uri GetDocumentUri(string id)
+        {
+            return UriFactory.CreateDocumentUri(_databaseId, _collectionId, id);
+        }
+
+        private Uri GetCollectionUri()
+        {
+            return UriFactory.CreateDocumentCollectionUri(_databaseId, _collectionId);
+        }
+    }
+}
