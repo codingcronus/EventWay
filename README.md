@@ -39,9 +39,6 @@ namespace EventWay.SampleApp
 
 		public async Task Run()
 		{
-			// Initialize EventWay framework
-			Initialize();
-
 			// Create sample application command
 			var registerUser = new RegisterUser(firstName: "Donald", lastName: "Duck");
 
