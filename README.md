@@ -15,7 +15,7 @@ EventWay is a modular Event Sourcing + CQRS framework.
 3. Invoke the Run method
 
 ```csharp
-    using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
