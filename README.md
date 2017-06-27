@@ -8,3 +8,10 @@ EventWay is a modular Event Sourcing + CQRS framework.
 3.1. Install the Async.EventWay.Infrastructure.MsSql package.
 3.2. Install the Async.EventWay.Infrastructure.CosmosDb package.
 
+
+```csharp
+    for (int i = 0 ; i < 10; i++)
+    {
+      // Code to execute.
+    }
+    ```
