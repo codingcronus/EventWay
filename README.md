@@ -1,7 +1,7 @@
 # EventWay
 EventWay is a modular Event Sourcing + CQRS framework.
 
-# How to setup
+## How to setup
 1. Create a new Console App (.NET Framework) project
 2. Right-click the project and select Manage NuGet Packages
 3. Select Browse and search for 'EventWay'.
@@ -9,7 +9,7 @@ EventWay is a modular Event Sourcing + CQRS framework.
 ⋅⋅2. Install the Async.EventWay.Infrastructure.MsSql package.
 ⋅⋅3. Install the Async.EventWay.Infrastructure.CosmosDb package.
 
-# Sample Application
+## Sample Application
 1. Update the configuration parameters in the Initialize method
 2. Invoke the Initialize method
 3. Invoke the Run method
