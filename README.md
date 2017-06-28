@@ -129,6 +129,11 @@ namespace EventWay.SampleApp.Core
 ```
 Notice how the state of the User (first name and last name) can only be changed from within the User Aggregate class. This means that state cannot be accessed from outside the aggregate class and should instead be accessed via Query Models (the *Q* in *CQRS*).
 
+Now that the Core has been fully defined, we can move on to the Application project.
+
+### Application project
+TODO: Insert class definitions.
+
 ### Infrastructure project
 1. Update the configuration parameters in the Initialize method
 2. Invoke the Initialize method
