@@ -24,7 +24,110 @@ Introducing this application architecture leads to three projects (or sub-folder
 We will start in the innermost layer, namely *Core*, and define the sample applications Aggregate class(es).
 
 ### Core project
-Hello World
+In the sample application we will create an User Aggregate. The user will have a first name and a last name and we should be able to sign up a new user.
+To sign up a new user, we'll create a Register User command. There're two kind of commands:
+1. Application Commands
+2. Domain Commands
+
+Application Commands are sent from the Infrastructure layer to the Application layer. The Domain Commands are sent from the Application layer to an Aggregate in the Domain layer. As a rule of thumb, we always start by defining the Core entities and logic and so we define a Register User **Domain Command**.
+
+#### RegisterUser.cs
+```csharp
+using EventWay.Core;
+
+namespace EventWay.SampleApp.Core.Commands
+{
+	public class RegisterUser : IDomainCommand
+	{
+		public RegisterUser(
+			string firstName,
+			string lastName)
+		{
+			FirstName = firstName;
+			LastName = lastName;
+		}
+
+		public string FirstName { get; private set; }
+		public string LastName { get; private set; }
+	}
+}
+```
+
+Once the command is handled by the User Aggregate, one or more events will be published by the aggregate. In our scenario only a single event will be published: The UserRegistered Event. Notice the present tense of commands (an action that is about to be executed) and past tense of events (something that has already occured).
+
+#### UserRegistered.cs
+```csharp
+using EventWay.Core;
+
+namespace EventWay.SampleApp.Core.Events
+{
+	public class UserRegistered : DomainEvent
+	{
+		public UserRegistered(
+			string firstName,
+			string lastName)
+		{
+			FirstName = firstName;
+			LastName = lastName;
+		}
+
+		public string FirstName { get; private set; }
+		public string LastName { get; private set; }
+	}
+}
+```
+Now that we have defined our Domain Command and Event, we can design the User Aggregate class. This class enforces all the business rules on the User class.
+
+#### User.cs
+```csharp
+using EventWay.Core;
+using EventWay.SampleApp.Core.Commands;
+using EventWay.SampleApp.Core.Events;
+using System;
+
+namespace EventWay.SampleApp.Core
+{
+	public class User : Aggregate
+	{
+		//Internal state
+		protected UserState State { get; private set; }
+
+		public User(Guid id) : base(id)
+		{
+			// Events
+			OnEvent<UserRegistered>(e => {
+				Console.WriteLine("Got UserRegistered event");
+
+				State = new UserState
+				{
+					FirstName = e.FirstName,
+					LastName = e.LastName
+				};
+			});
+
+			// Commands
+			OnCommand<RegisterUser>(c => {
+				Console.WriteLine("Got RegisterUser command");
+
+				if (State != null)
+					throw new Exception("User already exists");
+
+				Publish(new UserRegistered(
+					c.FirstName,
+					c.LastName));
+			});
+		}
+
+		// The internal state representation
+		public class UserState
+		{
+			public string FirstName { get; set; }
+			public string LastName { get; set; }
+		}
+	}
+}
+```
+Notice how the state of the User (first name and last name) can only be changed from within the User Aggregate class. This means that state cannot be accessed from outside the aggregate class and should instead be accessed via Query Models (the *Q* in *CQRS*).
 
 ### Infrastructure project
 1. Update the configuration parameters in the Initialize method
