@@ -14,11 +14,11 @@ This sample application is based on The Onion Architecture (aka Hexagonal Archit
 If you are not familiar with The Onion Architecture, I highly recommend you to read through Jeffrey Palermos excellent introduction (http://jeffreypalermo.com/blog/the-onion-architecture-part-1).
 
 Introducing this application architecture leads to three projects (or sub-folders in case of the application being very small) in our sample application:
-1. Core
+1. **Core**
    -This project contains the domain model and logic. Aggregates, Entity types, Value types and several service interfaces should all be contained here.
-2. Application
+2. **Application**
    -This project contains the application services which responsibility is to orchestrate domain logic and hence span entire use cases.
-3. Infrastructure
+3. **Infrastructure**
    -This project contains the host application (i.e. Web.api webservice, Console App, Xamarin app etc.)
 
 We will start in the innermost layer, namely *Core*, and define the sample applications Aggregate class(es).
