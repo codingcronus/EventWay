@@ -19,7 +19,7 @@ Introducing this application architecture leads to three projects (or sub-folder
 2. **Application**
    -This project contains the application services which responsibility is to orchestrate domain logic and hence span entire use cases.
 3. **Infrastructure**
-   -This project contains the host application (i.e. Web.api webservice, Console App, Xamarin app etc.)
+   -This project contains the host application (i.e. Web.api webservice, Console App, Xamarin app etc.) and other technology/vendor specific implementations.
 
 We will start in the innermost layer, namely *Core*, and define the sample applications Aggregate class(es).
 
