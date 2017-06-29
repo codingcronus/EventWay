@@ -3,6 +3,8 @@ EventWay is a modular Event Sourcing + CQRS framework.
 
 Event Sourcing and CQRS (Command Query Responsibility Segregation) works really well together in terms of distributed systems with constant and efficient write-speed + excellent read/query possibilities. Here's a diagram showing the architecture:
 
+![alt text](https://github.com/tigerdyret/EventWay/master/es-cqrs.png "Event Sourcing + CQRS")
+
 ## How to setup
 1. Create a new Console App (.NET Framework) project
 2. Right-click the project and select Manage NuGet Packages
