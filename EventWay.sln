@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventWay.Core", "EventWay.Core\EventWay.Core.csproj", "{E9944AB9-0D72-49EF-8D1A-21518A3F3CFB}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventWay.Infrastructure.MsSql", "EventWay.Infrastructure.MsSql\EventWay.Infrastructure.MsSql.csproj", "{E65693A1-5BE8-41C2-970E-4D9F48433B9A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventWay.Infrastructure.CosmosDb", "EventWay.Infrastructure.CosmosDb\EventWay.Infrastructure.CosmosDb.csproj", "{249FB03C-F3D8-4FBF-8270-98EFB68BF6B2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventWay.Infrastructure.ApplicationInsights", "EventWay.Infrastructure.ApplicationInsights\EventWay.Infrastructure.ApplicationInsights.csproj", "{96BECF10-D1D7-4B80-B982-63BA620124B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{249FB03C-F3D8-4FBF-8270-98EFB68BF6B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{249FB03C-F3D8-4FBF-8270-98EFB68BF6B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{249FB03C-F3D8-4FBF-8270-98EFB68BF6B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96BECF10-D1D7-4B80-B982-63BA620124B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96BECF10-D1D7-4B80-B982-63BA620124B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96BECF10-D1D7-4B80-B982-63BA620124B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96BECF10-D1D7-4B80-B982-63BA620124B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
