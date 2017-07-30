@@ -13,8 +13,7 @@ namespace EventWay.Infrastructure.MsSql
 
         public SqlServerEventRepository(string connectionString, bool createEventsTable=false)
         {
-            if (connectionString == null)
-				throw new ArgumentNullException(nameof(connectionString));
+            if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
 
             _connectionString = connectionString;
 
@@ -115,12 +114,12 @@ namespace EventWay.Infrastructure.MsSql
             }
         }
 
-        public List<OrderedEventPayload> GetEventsByType(Type[] eventTypes)
+        public List<OrderedEventPayload> GetEventsByTypes(Type[] eventTypes)
         {
-            return GetEventsByType(0L, eventTypes);
+            return GetEventsByTypes(0L, eventTypes);
         }
 
-        public List<OrderedEventPayload> GetEventsByType(long from, Type[] eventTypes)
+        public List<OrderedEventPayload> GetEventsByTypes(long from, Type[] eventTypes)
         {
             using (var conn = new SqlConnection(_connectionString))
             {
@@ -168,8 +167,20 @@ namespace EventWay.Infrastructure.MsSql
                     conn.Execute(insertSql, events, tx);
 
                     // Get ordered events
-                    const string selectSql = "SELECT * FROM Events WHERE EventId IN (@eventIds) ORDER BY Ordering";
-                    var listOfEventData = conn.Query<Event>(selectSql, new { eventIds = events.Select(x => x.EventId).ToArray() }, tx);
+                    //const string selectSql = "SELECT * FROM Events WHERE EventId IN (@eventIds) ORDER BY Ordering";
+
+                    var selectQuery = "SELECT * FROM Events WHERE EventId IN (";
+                    for (int i = 0; i < events.Length; i++)
+                    {
+                        if (i > 0)
+                            selectQuery += ", ";
+                        selectQuery += "'" + events[i].EventId + "'";
+                    }
+                    selectQuery += ") ORDER BY Ordering";
+
+                    var listOfEventData = conn.Query<Event>(selectQuery, null, tx);
+                    
+                    //var listOfEventData = conn.Query<Event>(selectSql, new { eventIds = events.Select(x => x.EventId).ToArray() }, tx);
                     var insertedEvents = listOfEventData
                         .Select(x => x.DeserializeOrderedEvent())
                         .ToList();

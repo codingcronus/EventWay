@@ -14,8 +14,8 @@ namespace EventWay.Core
         List<OrderedEventPayload> GetEventsByType(Type eventType);
         List<OrderedEventPayload> GetEventsByType(long from, Type eventType);
 
-        List<OrderedEventPayload> GetEventsByType(Type[] eventTypes);
-        List<OrderedEventPayload> GetEventsByType(long from, Type[] eventTypes);
+        List<OrderedEventPayload> GetEventsByTypes(Type[] eventTypes);
+        List<OrderedEventPayload> GetEventsByTypes(long from, Type[] eventTypes);
 
         int? GetVersionByAggregateId(Guid aggregateId);
 

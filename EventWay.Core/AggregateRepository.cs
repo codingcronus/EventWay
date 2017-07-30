@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace EventWay.Core
@@ -19,13 +20,23 @@ namespace EventWay.Core
 
         public T GetById<T>(Guid aggregateId) where T : IAggregate
         {
-            var events = _eventRepository.GetEventsByAggregateId(0L, aggregateId);
+            var loadFromEvent = 0L;
+
+            // Check for Snapshots
+            var lastEventIndex = _eventRepository.GetVersionByAggregateId(aggregateId);
+            var snapshotSize = _aggregateFactory.GetSnapshotSize<T>();
+            if (lastEventIndex.HasValue && lastEventIndex.Value >= snapshotSize)
+                loadFromEvent = lastEventIndex.Value - lastEventIndex.Value % (snapshotSize + 1);
+
+            // Load events
+            var events = _eventRepository.GetEventsByAggregateId(loadFromEvent, aggregateId);
             if (events == null)
                 throw new IndexOutOfRangeException("Could not find Aggregate with ID: " + aggregateId);
 
+            // Event spool aggregate
             var aggregate = _aggregateFactory.Create<T>(
                 aggregateId,
-                events.Select(e => e.EventPayload).ToArray()
+                events.Select(x => x.EventPayload).ToArray()
             );
 
             return aggregate;
@@ -48,7 +59,6 @@ namespace EventWay.Core
                 .ToArray();
 
             var storedAggregateVersion = _eventRepository.GetVersionByAggregateId(aggregate.Id);
-
             if (storedAggregateVersion.HasValue && storedAggregateVersion >= originalVersion)
                 throw new Exception("Concurrency exception");
 

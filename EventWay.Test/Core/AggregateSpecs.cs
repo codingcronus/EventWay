@@ -18,31 +18,32 @@ namespace EventWay.Test.Core
             testAggregate.PublishTestEvent();
 
             // ASSERT
-            //WhenMethodInvoked.ShouldBeTrue();
             Assert.IsTrue(WhenMethodInvoked);
         }
-    }
 
-    public class TestEvent
-    {
-        public string DummyPayload { get; set; }
-    }
 
-    public class TestAggregate : Aggregate
-    {
-        public void PublishTestEvent()
+        // INTERNAL TEST CLASSES
+        public class TestEvent
         {
-            var testEvent = new TestEvent()
-            {
-                DummyPayload = "Hello World"
-            };
-
-            this.Publish(testEvent);
+            public string DummyPayload { get; set; }
         }
 
-        private void When(TestEvent @event)
+        public class TestAggregate : Aggregate
         {
-            AggregateSpecs.WhenMethodInvoked = true;
+            public void PublishTestEvent()
+            {
+                var testEvent = new TestEvent()
+                {
+                    DummyPayload = "Hello World"
+                };
+
+                this.Publish(testEvent);
+            }
+
+            private void When(TestEvent @event)
+            {
+                AggregateSpecs.WhenMethodInvoked = true;
+            }
         }
     }
 }

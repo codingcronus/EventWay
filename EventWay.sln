@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventWay.Core", "EventWay.Core\EventWay.Core.csproj", "{E9944AB9-0D72-49EF-8D1A-21518A3F3CFB}"
 EndProject
@@ -14,6 +14,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventWay.Infrastructure.MsSql", "EventWay.Infrastructure.MsSql\EventWay.Infrastructure.MsSql.csproj", "{E65693A1-5BE8-41C2-970E-4D9F48433B9A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventWay.Infrastructure.CosmosDb", "EventWay.Infrastructure.CosmosDb\EventWay.Infrastructure.CosmosDb.csproj", "{249FB03C-F3D8-4FBF-8270-98EFB68BF6B2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F934D372-5B21-4BBC-8C4C-83C3484F900F}"
+	ProjectSection(SolutionItems) = preProject
+		create-packages.bat = create-packages.bat
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

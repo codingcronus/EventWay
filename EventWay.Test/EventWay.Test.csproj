@@ -32,6 +32,7 @@
   <ItemGroup>
     <Reference Include="nunit.framework, Version=3.7.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.3.7.1\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="NUnit.Specifications, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.Specifications.NUnit3.1.1.2\lib\net45\NUnit.Specifications.dll</HintPath>
@@ -50,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\AggregateSpecs.cs" />
+    <Compile Include="Core\SnapshotsSpecs.cs" />
     <Compile Include="Infrastructure\AggregateRepositoryWithSqlSpecs.cs" />
     <Compile Include="Infrastructure\DocumentDbQueryModelRepositorySpecs.cs" />
     <Compile Include="Infrastructure\QueryModelStoreWithDocumentDbQueryAndSqlProjectionSpecs.cs" />

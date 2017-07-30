@@ -5,6 +5,8 @@ namespace EventWay.Core
 {
     public interface IAggregate
     {
+        int SnapshotSize { get; }
+
         Guid Id { get; set; }
         int Version { get; set; }
 

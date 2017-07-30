@@ -47,13 +47,19 @@ namespace EventWay.Query
         {
             //TODO: Wrap in transaction and _eventOffset-- on error
 
+            await _queryModelRepository.Save(queryModel);
+
+            AcknowledgeEvent();
+        }
+
+        public void AcknowledgeEvent()
+        {
             _eventOffset++;
 
             var projectionMeta = new ProjectionMetadata(
                 _projectionId,
                 _eventOffset);
 
-            await _queryModelRepository.Save(queryModel);
             _projectionMetadataRepository.UpdateEventOffset(projectionMeta);
         }
     }
