@@ -4,13 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E9944AB9-0D72-49EF-8D1A-21518A3F3CFB}</ProjectGuid>
+    <ProjectGuid>{96BECF10-D1D7-4B80-B982-63BA620124B8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>EventWay.Core</RootNamespace>
-    <AssemblyName>EventWay.Core</AssemblyName>
+    <RootNamespace>EventWay.Infrastructure.ApplicationInsights</RootNamespace>
+    <AssemblyName>EventWay.Infrastructure.ApplicationInsights</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,12 +31,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Microsoft.ApplicationInsights, Version=2.4.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.ApplicationInsights.2.4.0\lib\net45\Microsoft.ApplicationInsights.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.4.4.0\lib\net45\System.Diagnostics.DiagnosticSource.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,30 +49,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Aggregate.cs" />
-    <Compile Include="IAggregateTracking.cs" />
-    <Compile Include="AggregateRepository.cs" />
-    <Compile Include="AggregateStore.cs" />
-    <Compile Include="CombGuid.cs" />
-    <Compile Include="DisposableAction.cs" />
-    <Compile Include="DomainEvent.cs" />
-    <Compile Include="Event.cs" />
-    <Compile Include="BasicEventListener.cs" />
-    <Compile Include="ExtendsEvent.cs" />
-    <Compile Include="IAggregate.cs" />
-    <Compile Include="IAggregateFactory.cs" />
-    <Compile Include="IAggregateRepository.cs" />
-    <Compile Include="IAggregateStore.cs" />
-    <Compile Include="IDomainCommand.cs" />
-    <Compile Include="IEventListener.cs" />
-    <Compile Include="IEventRepository.cs" />
-    <Compile Include="OrderedEventPayload.cs" />
+    <Compile Include="AggregateTracking.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SnapshotOffer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="EventWay.Core.nuspec" />
+    <None Include="EventWay.Infrastructure.ApplicationInsights.nuspec" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EventWay.Core\EventWay.Core.csproj">
+      <Project>{e9944ab9-0d72-49ef-8d1a-21518a3f3cfb}</Project>
+      <Name>EventWay.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
