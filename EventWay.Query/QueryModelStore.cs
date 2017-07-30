@@ -52,6 +52,11 @@ namespace EventWay.Query
             AcknowledgeEvent();
         }
 
+        public async Task DeleteQueryModel<T>(T queryModel) where T : QueryModel
+        {
+            await _queryModelRepository.DeleteById<T>(Guid.Parse(queryModel.AggregateId));
+        }
+
         public void AcknowledgeEvent()
         {
             _eventOffset++;

@@ -39,6 +39,23 @@ namespace EventWay.Infrastructure.CosmosDb
             CreateCollectionIfNotExistsAsync().Wait();
         }
 
+        public async Task DeleteById<T>(Guid id) where T : QueryModel
+        {
+            try
+            {
+                var modelId = typeof(T).Name + "-" + id;
+
+                var response = await _client.DeleteDocumentAsync(GetDocumentUri(modelId));
+            }
+            catch (DocumentClientException e)
+            {
+                if (e.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    return;
+
+                throw;
+            }
+        }
+
         public async Task<T> GetById<T>(Guid id) where T : QueryModel
         {
             try
