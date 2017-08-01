@@ -9,7 +9,7 @@ namespace EventWay.Core
     {
         private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
         {
-            TypeNameHandling = TypeNameHandling.None,
+            TypeNameHandling = TypeNameHandling.All,
             ContractResolver = new ShouldSerializeContractResolver()
         };
 
@@ -21,7 +21,7 @@ namespace EventWay.Core
         public static object DeserializeEvent(this Event x)
         {
             var eventType = Type.GetType(x.EventType);
-            var deserializedPayload = JsonConvert.DeserializeObject(x.Payload, eventType);
+            var deserializedPayload = JsonConvert.DeserializeObject(x.Payload, eventType, SerializerSettings);
 
             if (deserializedPayload.GetType().IsSubclassOf(typeof(DomainEvent)))
             {

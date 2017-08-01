@@ -88,9 +88,10 @@ namespace EventWay.Query
             {
                 //TODO: Handle exception
                 Trace.TraceError($"Error while processing event {eventType.FullName} in Projection {this.GetType().FullName}\nException: {e.ToString()}");
+                throw;
             }
 
-            return await Task.FromResult(0);
+            //return await Task.FromResult(0);
         }
 
         protected async Task ProcessEvents()
@@ -106,7 +107,9 @@ namespace EventWay.Query
             var events = _eventRepository.GetEvents(lastProcessedOffset);
 
             foreach (var @event in events)
+            {
                 await ProcessEvent(@event);
+            }
         }
     }
 }
