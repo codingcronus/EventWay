@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using EventWay.Core;
 using EventWay.Infrastructure.CosmosDb;
@@ -45,6 +46,21 @@ namespace EventWay.Test.Infrastructure
             Assert.AreEqual(queryModelId.ToString(), hydratedQueryModel.AggregateId);
             Assert.AreEqual("Hello Integration Test!", testQueryModel.DummyPayload);
             Assert.AreEqual(testQueryModel.DummyPayload, hydratedQueryModel.DummyPayload);
+        }
+
+        [Test]
+        public async Task ShouldSuccesfullyGetPagedList()
+        {
+            var repository = new DocumentDbQueryModelRepository(_database, _collection, _endpoint, _authKey);
+
+            var pagedQuery = new PagedQuery()
+            {
+                MaxItemCount = 2
+            };
+            var pagedResult = await repository.GetPagedListAsync<TestQueryModel>(pagedQuery);
+
+            // ASSERT
+            Assert.IsTrue(pagedResult.Data.Count() >= 0 && pagedResult.Data.Count() <= pagedResult.Count);
         }
     }
 

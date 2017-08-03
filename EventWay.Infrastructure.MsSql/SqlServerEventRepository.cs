@@ -11,7 +11,7 @@ namespace EventWay.Infrastructure.MsSql
     {
         private readonly string _connectionString;
 
-        public SqlServerEventRepository(string connectionString, bool createEventsTable=false)
+        public SqlServerEventRepository(string connectionString, bool createEventsTable = false)
         {
             if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
 
@@ -60,7 +60,7 @@ namespace EventWay.Infrastructure.MsSql
         {
             using (var conn = new SqlConnection(_connectionString))
             {
-                const string sql = "SELECT * FROM Events WHERE Ordering >= @from";
+                const string sql = "SELECT * FROM Events WHERE Ordering > @from";
 
                 var listOfEventData = conn.Query<Event>(sql, new { from });
 
@@ -81,7 +81,7 @@ namespace EventWay.Infrastructure.MsSql
         {
             using (var conn = new SqlConnection(_connectionString))
             {
-                const string sql = "SELECT * FROM Events WHERE AggregateId=@aggregateId AND Ordering >= @from";
+                const string sql = "SELECT * FROM Events WHERE AggregateId=@aggregateId AND Ordering > @from";
 
                 var listOfEventData = conn.Query<Event>(sql, new { aggregateId, from });
 
@@ -102,7 +102,7 @@ namespace EventWay.Infrastructure.MsSql
         {
             using (var conn = new SqlConnection(_connectionString))
             {
-                const string sql = "SELECT * FROM Events WHERE EventType=@eventType AND Ordering >= @from";
+                const string sql = "SELECT * FROM Events WHERE EventType=@eventType AND Ordering > @from";
 
                 var listOfEventData = conn.Query<Event>(sql, new { eventType.Name, from });
 
@@ -123,7 +123,7 @@ namespace EventWay.Infrastructure.MsSql
         {
             using (var conn = new SqlConnection(_connectionString))
             {
-                const string sql = "SELECT * FROM Events WHERE EventType IN(@eventType) AND Ordering >= @from";
+                const string sql = "SELECT * FROM Events WHERE EventType IN(@eventType) AND Ordering > @from";
 
                 var formattedEventTypes = eventTypes
                     .Select(x => x.Name)
@@ -154,7 +154,7 @@ namespace EventWay.Infrastructure.MsSql
         public OrderedEventPayload[] SaveEvents(Event[] events)
         {
             if (events.Any() == false)
-                return new OrderedEventPayload[]{}; // Nothing to save
+                return new OrderedEventPayload[] { }; // Nothing to save
 
             using (var conn = new SqlConnection(_connectionString))
             {
@@ -179,7 +179,7 @@ namespace EventWay.Infrastructure.MsSql
                     selectQuery += ") ORDER BY Ordering";
 
                     var listOfEventData = conn.Query<Event>(selectQuery, null, tx);
-                    
+
                     //var listOfEventData = conn.Query<Event>(selectSql, new { eventIds = events.Select(x => x.EventId).ToArray() }, tx);
                     var insertedEvents = listOfEventData
                         .Select(x => x.DeserializeOrderedEvent())
