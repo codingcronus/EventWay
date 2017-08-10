@@ -164,6 +164,8 @@ namespace EventWay.SampleApp.Application.Commands
 }
 ```
 
+Now that we have declared an application command, it's time to create a query model.
+
 #### UserQueryModel.cs
 ```csharp
 using System;
@@ -183,6 +185,10 @@ namespace EventWay.SampleApp.Application.QueryModels
     }
 }
 ```
+
+As you can see, the user query model contains both a first name, a last name and a display name. The display name is composed of the FirstName and LastName properties in the projection.
+
+Next up is the user application service. This service handles all the user specific application commands. Think of an application service as a service where full use cases are defined. One command triggers one use case.
 
 #### UserApplicationService.cs
 ```csharp
@@ -240,6 +246,8 @@ namespace EventWay.SampleApp.Application
     }
 }
 ```
+
+Finally we need a user projection in order to process the events published by our aggregate. The same event can be processed by multiple different projections. Usually one projection per query model type works well.
 
 #### UserProjection.cs
 ```csharp
@@ -305,6 +313,9 @@ namespace EventWay.SampleApp.Application.Projections
     }
 }
 ```
+
+The projection should be registered in the host bootstrapper so that it begins listening for events.
+EventWay manages state of each projection (hence the unique projection id) and spools all events from the last processed event. This basically means that a projection can be stopped, restarted and new projections can be declared even after the events have occured. This is an extremely important and powerful concept, which can be used in many scenarios such as new business analysis requirements etc.
 
 ### Infrastructure project
 There is no infrastructure project in this sample. The infrastructure project is for technology specific implementations of interfaces in the Application and Core project.
