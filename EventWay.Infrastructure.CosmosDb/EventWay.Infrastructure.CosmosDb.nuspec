@@ -21,7 +21,7 @@
       <dependency id="EnterpriseLibrary.TransientFaultHandling" version="6.0.1304" />
       <dependency id="Microsoft.Azure.DocumentDB.TransientFaultHandling" version="1.5.0" />
 
-      <dependency id="Async.EventWay.Query" version="1.0.2" />
+      <dependency id="Async.EventWay.Query" version="$version$" />
     </dependencies>
   </metadata>
 </package>

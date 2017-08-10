@@ -10,6 +10,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventWay.Infrastructure", "EventWay.Infrastructure\EventWay.Infrastructure.csproj", "{72BD6C9C-6C0C-421B-932A-003DA6F4F9F9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventWay.Test", "EventWay.Test\EventWay.Test.csproj", "{BB23921E-755E-457B-912E-B023FECB0BEB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{96BECF10-D1D7-4B80-B982-63BA620124B8} = {96BECF10-D1D7-4B80-B982-63BA620124B8}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventWay.Infrastructure.MsSql", "EventWay.Infrastructure.MsSql\EventWay.Infrastructure.MsSql.csproj", "{E65693A1-5BE8-41C2-970E-4D9F48433B9A}"
 EndProject

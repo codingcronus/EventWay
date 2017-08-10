@@ -139,6 +139,9 @@ Now that the Core has been fully defined, we can move on to the Application proj
 TODO: Insert class definitions.
 
 ### Infrastructure project
+There is no infrastructure project in this sample. The infrastructure project is for technology specific implementations of interfaces in the Application and Core project.
+
+### Host application project (e.g. Console App, Web.api service etc.)
 1. Update the configuration parameters in the Initialize method
 2. Invoke the Initialize method
 3. Invoke the Run method

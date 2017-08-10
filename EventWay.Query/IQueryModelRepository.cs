@@ -14,6 +14,11 @@ namespace EventWay.Query
         Task<IEnumerable<T>> GetAll<T>() where T : QueryModel;
         Task<IEnumerable<T>> GetAll<T>(Expression<Func<T, bool>> predicate) where T : QueryModel;
 
+        Task<PagedResult<T>> GetPagedListAsync<T>(PagedQuery pagedQuery) where T : QueryModel;
+        Task<PagedResult<T>> GetPagedListAsync<T>(PagedQuery pagedQuery, Expression<Func<T, bool>> predicate) where T : QueryModel;
+
+        Task<int> QueryCountAsync<T>();
+
         Task<T> QueryItemAsync<T>(Expression<Func<T, bool>> predicate) where T : QueryModel;
 
         Task DeleteById<T>(Guid id) where T : QueryModel;

@@ -1,14 +1,12 @@
-﻿using System;
+﻿using EventWay.Query;
+using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using EventWay.Query;
-using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
-using Microsoft.Azure.Documents.Client.TransientFaultHandling;
-using Microsoft.Azure.Documents.Linq;
-using Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling;
 
 namespace EventWay.Infrastructure.CosmosDb
 {
@@ -88,7 +86,7 @@ namespace EventWay.Infrastructure.CosmosDb
                 results.AddRange(await query.ExecuteNextAsync<T>());
             }
 
-            return results;
+            return results.AsReadOnly();
         }
 
         public async Task<IEnumerable<T>> GetAll<T>(Expression<Func<T, bool>> predicate) where T : QueryModel
@@ -106,7 +104,48 @@ namespace EventWay.Infrastructure.CosmosDb
                 results.AddRange(await query.ExecuteNextAsync<T>());
             }
 
-            return results;
+            return results.AsReadOnly();
+        }
+
+        public async Task<PagedResult<T>> GetPagedListAsync<T>(PagedQuery pagedQuery) where T : QueryModel
+        {
+            return await GetPagedListAsync<T>(pagedQuery, null);
+        }
+
+        public async Task<PagedResult<T>> GetPagedListAsync<T>(PagedQuery pagedQuery, Expression<Func<T, bool>> predicate) where T : QueryModel
+        {
+            var options = new FeedOptions
+            {
+                MaxItemCount = pagedQuery.MaxItemCount
+            };
+
+            if (!string.IsNullOrEmpty(pagedQuery.ContinuationToken))
+            {
+                options.RequestContinuation = pagedQuery.ContinuationToken;
+            }
+
+            var query = _client.CreateDocumentQuery<T>(GetCollectionUri(), options)
+                .Where(x => x.Type == typeof(T).Name);
+            if(predicate != null)
+            {
+                query = query.Where(predicate);
+            }
+
+            var results = await query.AsDocumentQuery().ExecuteNextAsync<T>();
+
+            var count = await QueryCountAsync<T>();
+
+            return new PagedResult<T>(results.ToList().AsReadOnly(), count, results.ResponseContinuation);
+        }
+
+        public async Task<int> QueryCountAsync<T>()
+        {
+            var sqlQuery = string.Format("SELECT VALUE COUNT(1) FROM c WHERE c.Type = \"{0}\"", typeof(T).Name);
+            var countQuery = _client.CreateDocumentQuery<int>(GetCollectionUri(), sqlQuery).AsDocumentQuery();
+
+            var results = await countQuery.ExecuteNextAsync<int>();
+
+            return results.FirstOrDefault();
         }
 
         public async Task<T> QueryItemAsync<T>(Expression<Func<T, bool>> predicate) where T : QueryModel
@@ -121,7 +160,7 @@ namespace EventWay.Infrastructure.CosmosDb
             if (query.HasMoreResults)
             {
                 //var dynamicResult = await (dynamic)query.ExecuteNextAsync().Result;
-                
+
                 //var results = (T) dynamicResults;
 
                 var results = await query.ExecuteNextAsync<T>();

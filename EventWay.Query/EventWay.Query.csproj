@@ -45,6 +45,8 @@
   <ItemGroup>
     <Compile Include="IProjectionMetadataRepository.cs" />
     <Compile Include="IQueryModelRepository.cs" />
+    <Compile Include="PagedQuery.cs" />
+    <Compile Include="PagedResult.cs" />
     <Compile Include="Projection.cs" />
     <Compile Include="ProjectionMetadata.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
