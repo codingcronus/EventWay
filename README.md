@@ -271,7 +271,12 @@ namespace EventWay.SampleApp.Application.Projections
             IEventRepository eventRepository,
             IEventListener eventListener,
             IQueryModelRepository queryModelRepository,
-            IProjectionMetadataRepository projectionMetadataRepository) : base(ProjectionId, eventRepository, eventListener, queryModelRepository, projectionMetadataRepository)
+            IProjectionMetadataRepository projectionMetadataRepository) : base(
+	    	ProjectionId, 
+		eventRepository, 
+		eventListener, 
+		queryModelRepository, 
+		projectionMetadataRepository)
         {
             projectionMetadataRepository.InitializeProjection(ProjectionId, this.GetType().Name);
         }
@@ -301,7 +306,8 @@ namespace EventWay.SampleApp.Application.Projections
         {
             // Get current instance of query model
 	    // Note: Since a user with that aggregate id does not exist, it will be created due to the "createIfMissing" flag.
-            var queryModel = await queryModelStore.GetQueryModel<UserQueryModel>(@event.AggregateId, createIfMissing: true);
+            var queryModel = await queryModelStore.GetQueryModel<UserQueryModel>(
+	    	@event.AggregateId, createIfMissing: true);
 
             // Set Query Model properties
             queryModel.FirstName = @event.FirstName;
