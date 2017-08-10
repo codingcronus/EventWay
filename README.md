@@ -23,7 +23,9 @@ Introducing this application architecture leads to three projects (or sub-folder
 2. **Application**
    -This project contains the application services which responsibility is to orchestrate domain logic and hence span entire use cases.
 3. **Infrastructure**
-   -This project contains the host application (i.e. Web.api webservice, Console App, Xamarin app etc.) and other technology/vendor specific implementations.
+   -This project is for technology/vendor specific implementations of interfaces in the Application and Core project.
+4. **Host**
+   -This project contains the host application (i.e. Web.api webservice, Console App, Xamarin app etc.). Sometimes this is part of the Infrastructure project.
 
 We will start in the innermost layer, namely *Core*, and define the sample applications Aggregate class(es).
 
@@ -136,7 +138,173 @@ Notice how the state of the User (first name and last name) can only be changed 
 Now that the Core has been fully defined, we can move on to the Application project.
 
 ### Application project
-TODO: Insert class definitions.
+In the application project we will create:
+1. A Register User Application Command.
+2. A User Query Model which is one example view of a user.
+3. An User Application Service where each method represents one use case.
+4. An User Projection which listens for events and creates a query model based on them.
+
+#### RegisterUser.cs
+```csharp
+namespace EventWay.SampleApp.Application.Commands
+{
+    public class RegisterUser
+    {
+        public RegisterUser(
+            string firstName,
+            string lastName)
+        {
+            FirstName = firstName;
+            LastName = lastName;
+        }
+
+        public string FirstName { get; private set; }
+        public string LastName { get; private set; }
+    }
+}
+```
+
+#### UserQueryModel.cs
+```csharp
+using System;
+using EventWay.Query;
+
+namespace EventWay.SampleApp.Application.QueryModels
+{
+    public class UserQueryModel : QueryModel
+    {
+        public UserQueryModel(Guid aggregateId) : base(aggregateId)
+        {
+        }
+
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string DisplayName { get; set; }
+    }
+}
+```
+
+#### UserApplicationService.cs
+```csharp
+using System;
+using System.Threading.Tasks;
+using EventWay.Core;
+using EventWay.Query;
+using EventWay.SampleApp.Application.QueryModels;
+using EventWay.SampleApp.Core;
+using EventWay.SampleApp.Core.Commands;
+
+namespace EventWay.SampleApp.Application
+{
+    public class UserApplicationService
+    {
+        public UserApplicationService(
+            IAggregateStore aggregateStore,
+            IQueryModelRepository queryModelRepository)
+        {
+            if (aggregateStore == null) throw new ArgumentNullException(nameof(aggregateStore));
+            if (queryModelRepository == null) throw new ArgumentNullException(nameof(queryModelRepository));
+
+            _aggregateStore = aggregateStore;
+            _queryModelRepository = queryModelRepository;
+        }
+
+        private readonly IAggregateStore _aggregateStore;
+        private readonly IQueryModelRepository _queryModelRepository;
+
+        public async Task<Guid> RegisterUser(Commands.RegisterUser command)
+        {
+            // Check if user already exists
+            var existingUser = await _queryModelRepository.QueryItemAsync<UserQueryModel>(x => x.DisplayName == $"{command.FirstName} {command.LastName}");
+            if (existingUser != null)
+                return Guid.Parse(existingUser.AggregateId);
+
+            // Create aggregate
+            var newUserId = Guid.NewGuid();
+            var user = new User(newUserId);
+
+            // Create domain command
+            var domainCommand = new Core.Commands.RegisterUser(
+                command.FirstName,
+                command.LastName);
+
+            // Fire command and wait for status response
+            user.Tell(domainCommand);
+
+            // Save User aggregate
+            // Note: This saves the events published internally by the User Aggregate)
+            await _aggregateStore.Save(user);
+
+            return newUserId;
+        }
+    }
+}
+```
+
+#### UserProjection.cs
+```csharp
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using EventWay.Core;
+using EventWay.Query;
+using EventWay.SampleApp.Application.QueryModels;
+using EventWay.SampleApp.Core.Events;
+
+namespace EventWay.SampleApp.Application.Projections
+{
+    public class UserProjection : Projection
+    {
+        // Constant ID for projection. Generated from https://www.guidgenerator.com
+        private static readonly Guid ProjectionId = Guid.Parse("cb7fdee9-aa3b-4f91-b906-011f4b18e6ec");
+
+        public UserProjection(
+            IEventRepository eventRepository,
+            IEventListener eventListener,
+            IQueryModelRepository queryModelRepository,
+            IProjectionMetadataRepository projectionMetadataRepository) : base(ProjectionId, eventRepository, eventListener, queryModelRepository, projectionMetadataRepository)
+        {
+            projectionMetadataRepository.InitializeProjection(ProjectionId, this.GetType().Name);
+        }
+
+        public async Task<UserQueryModel> QueryById(Guid id)
+        {
+            return await QueryModelRepository.GetById<UserQueryModel>(id);
+        }
+
+        public async Task<UserQueryModel[]> QueryAll()
+        {
+            return (await QueryModelRepository.GetAll<UserQueryModel>(x => true)).ToArray();
+        }
+
+        public override void Listen()
+        {
+            // Listen for events
+            OnEvent<UserRegistered>(Handle);
+
+            // TODO: Add your events of interest here...
+
+            // Process events for User aggregate
+            ProcessEvents().Wait();
+        }
+
+        private async Task Handle(UserRegistered @event, QueryModelStore queryModelStore)
+        {
+            // Get current instance of query model
+	    // Note: Since a user with that aggregate id does not exist, it will be created due to the "createIfMissing" flag.
+            var queryModel = await queryModelStore.GetQueryModel<UserQueryModel>(@event.AggregateId, createIfMissing: true);
+
+            // Set Query Model properties
+            queryModel.FirstName = @event.FirstName;
+            queryModel.LastName = @event.LastName;
+            queryModel.DisplayName = @event.FirstName + " " + @event.LastName;
+
+            // Create or Update Query model in Read Store (E.g. CosmosDB)
+            await queryModelStore.SaveQueryModel(queryModel);
+        }
+    }
+}
+```
 
 ### Infrastructure project
 There is no infrastructure project in this sample. The infrastructure project is for technology specific implementations of interfaces in the Application and Core project.
