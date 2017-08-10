@@ -32,7 +32,7 @@ namespace EventWay.SampleApp
         public async Task Run()
         {
             // Create sample application command
-            var registerUser = new RegisterUser(firstName: "Donald", lastName: "Duck");
+            var registerUser = new Application.Commands.RegisterUser(firstName: "Donald", lastName: "Duck");
 
             // Invoke sample application service
             var userId = await UserApplicationService.RegisterUser(registerUser);

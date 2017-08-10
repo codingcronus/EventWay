@@ -40,14 +40,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\RegisterUser.cs" />
     <Compile Include="Projections\UserProjection.cs" />
     <Compile Include="QueryModels\UserQueryModel.cs" />
     <Compile Include="UserApplicationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Commands\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\EventWay.Core\EventWay.Core.csproj">
       <Project>{E9944AB9-0D72-49EF-8D1A-21518A3F3CFB}</Project>

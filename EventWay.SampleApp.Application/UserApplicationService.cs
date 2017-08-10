@@ -24,7 +24,7 @@ namespace EventWay.SampleApp.Application
         private readonly IAggregateStore _aggregateStore;
         private readonly IQueryModelRepository _queryModelRepository;
 
-        public async Task<Guid> RegisterUser(RegisterUser command)
+        public async Task<Guid> RegisterUser(Commands.RegisterUser command)
         {
             // Check if user already exists
             var existingUser = await _queryModelRepository.QueryItemAsync<UserQueryModel>(x => x.DisplayName == $"{command.FirstName} {command.LastName}");
