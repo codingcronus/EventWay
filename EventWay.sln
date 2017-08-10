@@ -19,7 +19,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		create-packages.bat = create-packages.bat
 	EndProjectSection
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventWay.Infrastructure.ApplicationInsights", "EventWay.Infrastructure.ApplicationInsights\EventWay.Infrastructure.ApplicationInsights.csproj", "{96BECF10-D1D7-4B80-B982-63BA620124B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventWay.SampleApp", "EventWay.SampleApp\EventWay.SampleApp.csproj", "{25C06E5E-A855-4762-883B-147F871061FE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{1DB06867-FCF3-441A-84AA-E0268AE50F3B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventWay.SampleApp.Core", "EventWay.SampleApp.Core\EventWay.SampleApp.Core.csproj", "{E26F7E24-9964-434C-B38D-A9C863534D66}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventWay.SampleApp.Application", "EventWay.SampleApp.Application\EventWay.SampleApp.Application.csproj", "{81A3910E-BD8D-4AC3-889D-5DBD11E61EC0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,9 +64,26 @@ Global
 		{96BECF10-D1D7-4B80-B982-63BA620124B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96BECF10-D1D7-4B80-B982-63BA620124B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96BECF10-D1D7-4B80-B982-63BA620124B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25C06E5E-A855-4762-883B-147F871061FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25C06E5E-A855-4762-883B-147F871061FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25C06E5E-A855-4762-883B-147F871061FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25C06E5E-A855-4762-883B-147F871061FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E26F7E24-9964-434C-B38D-A9C863534D66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E26F7E24-9964-434C-B38D-A9C863534D66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E26F7E24-9964-434C-B38D-A9C863534D66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E26F7E24-9964-434C-B38D-A9C863534D66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81A3910E-BD8D-4AC3-889D-5DBD11E61EC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81A3910E-BD8D-4AC3-889D-5DBD11E61EC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81A3910E-BD8D-4AC3-889D-5DBD11E61EC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81A3910E-BD8D-4AC3-889D-5DBD11E61EC0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{25C06E5E-A855-4762-883B-147F871061FE} = {1DB06867-FCF3-441A-84AA-E0268AE50F3B}
+		{E26F7E24-9964-434C-B38D-A9C863534D66} = {1DB06867-FCF3-441A-84AA-E0268AE50F3B}
+		{81A3910E-BD8D-4AC3-889D-5DBD11E61EC0} = {1DB06867-FCF3-441A-84AA-E0268AE50F3B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8

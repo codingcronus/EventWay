@@ -9,10 +9,9 @@ namespace EventWay.Core
         private readonly IAggregateTracking _aggregateTracking;
         private readonly IEventListener _eventListener;
 
-        public AggregateStore(IAggregateRepository aggregateRepository, IAggregateTracking aggregateTracking, IEventListener eventListener)
+        public AggregateStore(IAggregateRepository aggregateRepository, IEventListener eventListener, IAggregateTracking aggregateTracking = null)
         {
             if (aggregateRepository == null) throw new ArgumentNullException(nameof(aggregateRepository));
-            if (aggregateTracking == null) throw new ArgumentNullException(nameof(aggregateTracking));
             if (eventListener == null) throw new ArgumentNullException(nameof(eventListener));
 
             _aggregateRepository = aggregateRepository;
@@ -27,7 +26,8 @@ namespace EventWay.Core
 
         public async Task Save(IAggregate aggregate)
         {
-            _aggregateTracking.TrackEvents(aggregate);
+            if (_aggregateTracking != null)
+                _aggregateTracking.TrackEvents(aggregate);
 
             var orderedEvents = _aggregateRepository.Save(aggregate);
 
