@@ -21,6 +21,8 @@ namespace EventWay.Query
 
         Task<T> QueryItemAsync<T>(Expression<Func<T, bool>> predicate) where T : QueryModel;
 
+        Task<bool> DoesItemExist<T>(Guid id);
+
         Task DeleteById<T>(Guid id) where T : QueryModel;
     }
 }

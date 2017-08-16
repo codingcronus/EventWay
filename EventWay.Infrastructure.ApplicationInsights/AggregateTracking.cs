@@ -1,6 +1,7 @@
 ﻿using EventWay.Core;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
+using System.Collections.Generic;
 
 namespace EventWay.Infrastructure.ApplicationInsights
 {
@@ -26,6 +27,14 @@ namespace EventWay.Infrastructure.ApplicationInsights
             }
 
             _telemetryClient.TrackEvent(evt);
+        }
+
+        public void TrackEvents<T>(IEnumerable<T> aggregates) where T : IAggregate
+        {
+            foreach(var aggregate in aggregates)
+            {
+                TrackEvents(aggregate);
+            }
         }
     }
 }

@@ -126,7 +126,7 @@ namespace EventWay.Infrastructure.CosmosDb
 
             var query = _client.CreateDocumentQuery<T>(GetCollectionUri(), options)
                 .Where(x => x.Type == typeof(T).Name);
-            if(predicate != null)
+            if (predicate != null)
             {
                 query = query.Where(predicate);
             }
@@ -169,6 +169,17 @@ namespace EventWay.Infrastructure.CosmosDb
             }
 
             return null;
+        }
+
+        public async Task<bool> DoesItemExist<T>(Guid id)
+        {
+            var modelId = typeof(T).Name + "-" + id;
+            var sqlQuery = string.Format("SELECT VALUE COUNT(1) FROM c WHERE c.id = \"{0}\"", modelId);
+            var countQuery = _client.CreateDocumentQuery<int>(GetCollectionUri(), sqlQuery).AsDocumentQuery();
+
+            var results = await countQuery.ExecuteNextAsync<int>();
+
+            return results.Count > 0 && results.FirstOrDefault() > 0;
         }
 
         public async Task Save(QueryModel queryModel)

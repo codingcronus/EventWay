@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace EventWay.Core
@@ -7,5 +8,6 @@ namespace EventWay.Core
     {
         T GetById<T>(Guid aggregateId) where T : IAggregate;
         Task Save(IAggregate aggregate);
+        Task Save<T>(IEnumerable<T> aggregates) where T : IAggregate;
     }
 }

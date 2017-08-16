@@ -44,11 +44,9 @@ namespace EventWay.Core
 
         public OrderedEventPayload[] Save(IAggregate aggregate)
         {
-            //TODO: Handle errors
-
             var events = aggregate.GetUncommittedEvents().ToArray();
             if (events.Any() == false)
-                return new OrderedEventPayload[]{}; // Nothing to save
+                return new OrderedEventPayload[] { }; // Nothing to save
 
             var aggregateType = aggregate.GetType().Name;
 
@@ -60,11 +58,45 @@ namespace EventWay.Core
 
             var storedAggregateVersion = _eventRepository.GetVersionByAggregateId(aggregate.Id);
             if (storedAggregateVersion.HasValue && storedAggregateVersion >= originalVersion)
+            {
                 throw new Exception("Concurrency exception");
+            }
 
             var orderedEvents = _eventRepository.SaveEvents(eventsToSave);
 
             aggregate.ClearUncommittedEvents();
+
+            return orderedEvents;
+        }
+
+        public OrderedEventPayload[] Save<T>(IEnumerable<T> aggregates) where T : IAggregate
+        {
+            var allEventsToSave = new List<Event>();
+            foreach (var aggregate in aggregates)
+            {
+                var events = aggregate.GetUncommittedEvents().ToArray();
+                
+                var aggregateType = aggregate.GetType().Name;
+
+                var originalVersion = aggregate.Version - events.Count() + 1;
+
+                var eventsToSave = events.Select(e => e.ToEventData(aggregateType, aggregate.Id, originalVersion++));
+
+                var storedAggregateVersion = _eventRepository.GetVersionByAggregateId(aggregate.Id);
+                if (storedAggregateVersion.HasValue && storedAggregateVersion >= originalVersion)
+                {
+                    throw new Exception("Concurrency exception");
+                }
+
+                allEventsToSave.AddRange(eventsToSave);
+            }
+
+            var orderedEvents = _eventRepository.SaveEvents(allEventsToSave.ToArray());
+
+            foreach (var aggregate in aggregates)
+            {
+                aggregate.ClearUncommittedEvents();
+            }
 
             return orderedEvents;
         }
