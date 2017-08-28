@@ -103,5 +103,16 @@ namespace EventWay.Infrastructure.MsSql
                 throw;
             }
         }
+
+        public void ClearProjections()
+        {
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                const string sql = @"UPDATE ProjectionMetadata SET EventOffset = 0";
+                conn.Execute(sql);
+            }
+        }
     }
 }

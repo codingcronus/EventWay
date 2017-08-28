@@ -20,5 +20,7 @@ namespace EventWay.Core
         int? GetVersionByAggregateId(Guid aggregateId);
 
         OrderedEventPayload[] SaveEvents(Event[] eventsToSave);
+
+        void ClearEvents();
     }
 }

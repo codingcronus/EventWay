@@ -24,5 +24,7 @@ namespace EventWay.Query
         Task<bool> DoesItemExist<T>(Guid id);
 
         Task DeleteById<T>(Guid id) where T : QueryModel;
+
+        Task ClearCollectionAsync();
     }
 }

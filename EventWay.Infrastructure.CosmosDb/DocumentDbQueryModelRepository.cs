@@ -203,11 +203,39 @@ namespace EventWay.Infrastructure.CosmosDb
             }
         }
 
+        public async Task ClearCollectionAsync()
+        {
+            await DeleteCollectionIfNotExistsAsync();
+            await CreateCollectionIfNotExistsAsync();
+        }
+
         private async Task CreateCollectionIfNotExistsAsync()
         {
             try
             {
                 await _client.ReadDocumentCollectionAsync(GetCollectionUri());
+            }
+            catch (DocumentClientException e)
+            {
+                if (e.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    await _client.CreateDocumentCollectionAsync(
+                        UriFactory.CreateDatabaseUri(_databaseId),
+                        new DocumentCollection { Id = _collectionId },
+                        new RequestOptions { OfferThroughput = 1000 });
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+        private async Task DeleteCollectionIfNotExistsAsync()
+        {
+            try
+            {
+                await _client.DeleteDocumentCollectionAsync(GetCollectionUri());
             }
             catch (DocumentClientException e)
             {

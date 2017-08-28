@@ -191,5 +191,16 @@ namespace EventWay.Infrastructure.MsSql
                 }
             }
         }
+
+        public void ClearEvents()
+        {
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                const string sql = "TRUNCATE TABLE [Events]";
+                conn.Execute(sql);
+            }
+        }
     }
 }
