@@ -14,19 +14,23 @@ namespace EventWay.Infrastructure.CosmosDb
     {
         private readonly string _databaseId;
         private readonly string _collectionId;
+        private readonly string _endpoint;
+        private readonly string _authKey;
         //private readonly IReliableReadWriteDocumentClient _client;
-        private readonly DocumentClient _client;
+        private DocumentClient _client;
 
         public DocumentDbQueryModelRepository(string database, string collection, string endpoint, string authKey)
         {
             _databaseId = database;
             _collectionId = collection;
+            _endpoint = endpoint;
+            _authKey = authKey;
 
-            _client = new DocumentClient(new Uri(endpoint), authKey,
-                new ConnectionPolicy
-                {
-                    EnableEndpointDiscovery = false
-                }
+            _client = new DocumentClient(new Uri(_endpoint), _authKey,
+               new ConnectionPolicy
+               {
+                   EnableEndpointDiscovery = false
+               }
             );
             //.AsReliable(new FixedInterval(10, TimeSpan.FromSeconds(1)));
         }
@@ -205,7 +209,18 @@ namespace EventWay.Infrastructure.CosmosDb
 
         public async Task ClearCollectionAsync()
         {
-            await DeleteCollectionIfNotExistsAsync();
+            await _client.DeleteDocumentCollectionAsync(GetCollectionUri());
+
+            // Refresh document client session
+            _client.Dispose();
+
+            _client = new DocumentClient(new Uri(_endpoint), _authKey,
+                new ConnectionPolicy
+                {
+                    EnableEndpointDiscovery = false
+                }
+            );
+
             await CreateCollectionIfNotExistsAsync();
         }
 
@@ -214,28 +229,6 @@ namespace EventWay.Infrastructure.CosmosDb
             try
             {
                 await _client.ReadDocumentCollectionAsync(GetCollectionUri());
-            }
-            catch (DocumentClientException e)
-            {
-                if (e.StatusCode == System.Net.HttpStatusCode.NotFound)
-                {
-                    await _client.CreateDocumentCollectionAsync(
-                        UriFactory.CreateDatabaseUri(_databaseId),
-                        new DocumentCollection { Id = _collectionId },
-                        new RequestOptions { OfferThroughput = 1000 });
-                }
-                else
-                {
-                    throw;
-                }
-            }
-        }
-
-        private async Task DeleteCollectionIfNotExistsAsync()
-        {
-            try
-            {
-                await _client.DeleteDocumentCollectionAsync(GetCollectionUri());
             }
             catch (DocumentClientException e)
             {
