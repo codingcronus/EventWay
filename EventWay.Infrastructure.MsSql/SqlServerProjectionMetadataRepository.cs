@@ -7,6 +7,8 @@ namespace EventWay.Infrastructure.MsSql
 {
     public class SqlServerProjectionMetadataRepository : IProjectionMetadataRepository
     {
+        const int CommandTimeout = 600;
+
         private readonly string _connectionString;
 
         public SqlServerProjectionMetadataRepository(string connectionString, bool createProjectionMetadataTable = false)
@@ -41,7 +43,7 @@ namespace EventWay.Infrastructure.MsSql
                 conn.Open();
 
                 const string sql = "UPDATE ProjectionMetadata SET EventOffset = 0";
-                conn.Execute(sql);
+                conn.Execute(sql, commandTimeout: CommandTimeout);
             }
         }
 
@@ -52,7 +54,7 @@ namespace EventWay.Infrastructure.MsSql
                 conn.Open();
 
                 const string sql = "SELECT ProjectionId, EventOffset FROM ProjectionMetadata WHERE ProjectionId=@projectionId";
-                var projection = conn.QuerySingle<ProjectionMetadata>(sql, new { projectionId });
+                var projection = conn.QuerySingle<ProjectionMetadata>(sql, new { projectionId }, commandTimeout: CommandTimeout);
 
                 return projection;
             }
@@ -65,7 +67,7 @@ namespace EventWay.Infrastructure.MsSql
                 conn.Open();
 
                 const string sql = @"UPDATE ProjectionMetadata SET EventOffset = @EventOffset WHERE ProjectionId = @ProjectionId";
-                conn.Execute(sql, projectionMetadata);
+                conn.Execute(sql, projectionMetadata, commandTimeout: CommandTimeout);
             }
         }
 
@@ -87,7 +89,7 @@ namespace EventWay.Infrastructure.MsSql
                         EventOffset = 0L
                     };
 
-                    conn.Execute(sql, projectionMetadata);
+                    conn.Execute(sql, projectionMetadata, commandTimeout: CommandTimeout);
                 }
             }
             catch (SqlException sqlException)
@@ -111,7 +113,7 @@ namespace EventWay.Infrastructure.MsSql
                 conn.Open();
 
                 const string sql = @"UPDATE ProjectionMetadata SET EventOffset = 0";
-                conn.Execute(sql);
+                conn.Execute(sql, commandTimeout: CommandTimeout);
             }
         }
     }

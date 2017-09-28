@@ -9,6 +9,8 @@ namespace EventWay.Infrastructure.MsSql
 {
     public class SqlServerEventRepository : IEventRepository
     {
+        const int CommandTimeout = 600;
+
         private readonly string _connectionString;
 
         public SqlServerEventRepository(string connectionString, bool createEventsTable = false)
@@ -62,7 +64,7 @@ namespace EventWay.Infrastructure.MsSql
             {
                 const string sql = "SELECT * FROM Events WHERE Ordering > @from";
 
-                var listOfEventData = conn.Query<Event>(sql, new { from });
+                var listOfEventData = conn.Query<Event>(sql, new { from }, commandTimeout: CommandTimeout);
 
                 var events = listOfEventData
                     .Select(x => x.DeserializeOrderedEvent())
@@ -83,7 +85,7 @@ namespace EventWay.Infrastructure.MsSql
             {
                 const string sql = "SELECT * FROM Events WHERE AggregateId=@aggregateId AND Ordering > @from";
 
-                var listOfEventData = conn.Query<Event>(sql, new { aggregateId, from });
+                var listOfEventData = conn.Query<Event>(sql, new { aggregateId, from }, commandTimeout: CommandTimeout);
 
                 var events = listOfEventData
                     .Select(x => x.DeserializeOrderedEvent())
@@ -104,7 +106,7 @@ namespace EventWay.Infrastructure.MsSql
             {
                 const string sql = "SELECT * FROM Events WHERE EventType=@eventType AND Ordering > @from";
 
-                var listOfEventData = conn.Query<Event>(sql, new { eventType.Name, from });
+                var listOfEventData = conn.Query<Event>(sql, new { eventType.Name, from }, commandTimeout: CommandTimeout);
 
                 var events = listOfEventData
                     .Select(x => x.DeserializeOrderedEvent())
@@ -129,7 +131,7 @@ namespace EventWay.Infrastructure.MsSql
                     .Select(x => x.Name)
                     .Aggregate((i, j) => i + ",'" + j + "'");
 
-                var listOfEventData = conn.Query<Event>(sql, new { formattedEventTypes, from });
+                var listOfEventData = conn.Query<Event>(sql, new { formattedEventTypes, from }, commandTimeout: CommandTimeout);
 
                 var events = listOfEventData
                     .Select(x => x.DeserializeOrderedEvent())
@@ -145,7 +147,7 @@ namespace EventWay.Infrastructure.MsSql
             {
                 const string sql = "SELECT MAX(Version) FROM Events WHERE AggregateId=@aggregateId";
 
-                var version = (int?)conn.ExecuteScalar(sql, new { aggregateId });
+                var version = (int?)conn.ExecuteScalar(sql, new { aggregateId }, commandTimeout: CommandTimeout);
 
                 return version;
             }
@@ -164,7 +166,7 @@ namespace EventWay.Infrastructure.MsSql
                 {
                     // Save events
                     const string insertSql = @"INSERT INTO Events(EventId, Created, EventType, AggregateType, AggregateId, Version, Payload, Metadata) VALUES (@EventId, @Created, @EventType, @AggregateType, @AggregateId, @Version, @Payload, @Metadata)";
-                    conn.Execute(insertSql, events, tx);
+                    conn.Execute(insertSql, events, tx, commandTimeout: CommandTimeout);
 
                     // Get ordered events
                     //const string selectSql = "SELECT * FROM Events WHERE EventId IN (@eventIds) ORDER BY Ordering";
@@ -178,7 +180,7 @@ namespace EventWay.Infrastructure.MsSql
                     }
                     selectQuery += ") ORDER BY Ordering";
 
-                    var listOfEventData = conn.Query<Event>(selectQuery, null, tx);
+                    var listOfEventData = conn.Query<Event>(selectQuery, null, tx, commandTimeout: CommandTimeout);
 
                     //var listOfEventData = conn.Query<Event>(selectSql, new { eventIds = events.Select(x => x.EventId).ToArray() }, tx);
                     var insertedEvents = listOfEventData
@@ -199,7 +201,7 @@ namespace EventWay.Infrastructure.MsSql
                 conn.Open();
 
                 const string sql = "TRUNCATE TABLE [Events]";
-                conn.Execute(sql);
+                conn.Execute(sql, commandTimeout: CommandTimeout);
             }
         }
     }
