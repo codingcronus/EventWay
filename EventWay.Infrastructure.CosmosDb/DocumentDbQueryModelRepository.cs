@@ -14,15 +14,17 @@ namespace EventWay.Infrastructure.CosmosDb
     {
         private readonly string _databaseId;
         private readonly string _collectionId;
+        private readonly int _offerThroughput;
         private readonly string _endpoint;
         private readonly string _authKey;
         //private readonly IReliableReadWriteDocumentClient _client;
         private DocumentClient _client;
 
-        public DocumentDbQueryModelRepository(string database, string collection, string endpoint, string authKey)
+        public DocumentDbQueryModelRepository(string database, string collection, int offerThroughput, string endpoint, string authKey)
         {
             _databaseId = database;
             _collectionId = collection;
+            _offerThroughput = offerThroughput;
             _endpoint = endpoint;
             _authKey = authKey;
 
@@ -237,7 +239,7 @@ namespace EventWay.Infrastructure.CosmosDb
                     await _client.CreateDocumentCollectionAsync(
                         UriFactory.CreateDatabaseUri(_databaseId),
                         new DocumentCollection { Id = _collectionId },
-                        new RequestOptions { OfferThroughput = 1000 });
+                        new RequestOptions { OfferThroughput = _offerThroughput });
                 }
                 else
                 {

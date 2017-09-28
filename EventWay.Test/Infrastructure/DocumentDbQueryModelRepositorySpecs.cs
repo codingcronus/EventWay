@@ -13,6 +13,7 @@ namespace EventWay.Test.Infrastructure
     {
         private readonly string _database = "vanda-integration-test";
         private readonly string _collection = "Projections";
+        private readonly int _offerThroughput = 10000;
         private readonly string _endpoint = "https://localhost:8081";
         private readonly string _authKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
 
@@ -20,7 +21,7 @@ namespace EventWay.Test.Infrastructure
         public void ShouldSuccesfullyInitializeDatabaseAndCollection()
         {
             // ARRANGE
-            var repository = new DocumentDbQueryModelRepository(_database, _collection, _endpoint, _authKey);
+            var repository = new DocumentDbQueryModelRepository(_database, _collection, _offerThroughput, _endpoint, _authKey);
 
             // ACT
             repository.Initialize();
@@ -32,7 +33,7 @@ namespace EventWay.Test.Infrastructure
         public async Task ShouldSuccesfullyCreateAndHydrateQueryModel()
         {
             // ARRANGE
-            var repository = new DocumentDbQueryModelRepository(_database, _collection, _endpoint, _authKey);
+            var repository = new DocumentDbQueryModelRepository(_database, _collection, _offerThroughput, _endpoint, _authKey);
 
             var queryModelId = CombGuid.Generate();
             var testQueryModel = new TestQueryModel(queryModelId, "Hello Integration Test!");
@@ -51,7 +52,7 @@ namespace EventWay.Test.Infrastructure
         [Test]
         public async Task ShouldSuccesfullyGetPagedList()
         {
-            var repository = new DocumentDbQueryModelRepository(_database, _collection, _endpoint, _authKey);
+            var repository = new DocumentDbQueryModelRepository(_database, _collection, _offerThroughput, _endpoint, _authKey);
 
             var pagedQuery = new PagedQuery()
             {
