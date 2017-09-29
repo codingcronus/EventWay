@@ -63,10 +63,10 @@ namespace EventWay.SampleApp
             var offerThroughput = 10000;
 
             // Event Repository
-            var eventRepository = new SqlServerEventRepository(eventDatabaseConnectionString, createEventsTable: true);
+            var eventRepository = new SqlServerEventRepository(eventDatabaseConnectionString);
 
             // Projection Metadata Repository
-            var projectionMetadataRepository = new SqlServerProjectionMetadataRepository(projectionMetadataDatabaseConnectionString, createProjectionMetadataTable: true);
+            var projectionMetadataRepository = new SqlServerProjectionMetadataRepository(projectionMetadataDatabaseConnectionString);
 
             // Query Model Repository
             var queryModelRepository = new DocumentDbQueryModelRepository(cosmosDbDatabaseId, cosmosDbCollectionId, offerThroughput, cosmosDbEndpoint, cosmosDbAuthKey);

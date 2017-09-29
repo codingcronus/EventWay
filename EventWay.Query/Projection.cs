@@ -9,7 +9,7 @@ namespace EventWay.Query
     public abstract class Projection
     {
         protected Projection(
-            Guid projectionId, 
+            Guid projectionId,
             IEventRepository eventRepository,
             IEventListener eventListener,
             IQueryModelRepository queryModelRepository,
@@ -94,7 +94,7 @@ namespace EventWay.Query
             //return await Task.FromResult(0);
         }
 
-        protected async Task ProcessEvents()
+        protected async Task ProcessEvents<TAggregate>() where TAggregate : Aggregate
         {
             // Get projection metadata
             var projectionMeta = _projectionMetadataRepository.GetByProjectionId(_projectionId);
@@ -102,9 +102,8 @@ namespace EventWay.Query
             // Get event source from Aggregate
             var lastProcessedOffset = projectionMeta.EventOffset;
 
-            // Get all events since lastProcessedOffset
-            // TODO: Get only of subscribed types - Huge optimization!
-            var events = _eventRepository.GetEvents(lastProcessedOffset);
+            // Get all events since lastProcessedOffset belongs to Aggregate
+            var events = _eventRepository.GetEvents<TAggregate>(lastProcessedOffset);
 
             foreach (var @event in events)
             {

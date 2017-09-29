@@ -1,5 +1,6 @@
 using EventWay.Core;
 using NUnit.Framework;
+using System;
 
 namespace EventWay.Test.Core
 {
@@ -24,7 +25,7 @@ namespace EventWay.Test.Core
         public void ShouldNotSaveSnapshot()
         {
             // ARRANGE
-            var testAggregate = new TestAggregate();
+            var testAggregate = new TestAggregate(Guid.NewGuid());
 
             // ACT
             // Publish 3 events. This should not create a snapshot
@@ -41,7 +42,7 @@ namespace EventWay.Test.Core
         public void ShouldSaveOneSnapshot()
         {
             // ARRANGE
-            var testAggregate = new TestAggregate();
+            var testAggregate = new TestAggregate(Guid.NewGuid());
 
             // ACT
             // Publish 4 events. This should create a snapshot
@@ -60,7 +61,7 @@ namespace EventWay.Test.Core
         public void ShouldNotSaveSnapshotWithOneExistingSnapshot()
         {
             // ARRANGE
-            var testAggregate = new TestAggregate();
+            var testAggregate = new TestAggregate(Guid.NewGuid());
 
             // ACT
             // Publish 7 events. This should create a snapshot
@@ -76,7 +77,7 @@ namespace EventWay.Test.Core
         public void ShouldSaveSnapshotWithOneExistingSnapshot()
         {
             // ARRANGE
-            var testAggregate = new TestAggregate();
+            var testAggregate = new TestAggregate(Guid.NewGuid());
 
             // ACT
             // Publish 10 events. This should create two snapshots
@@ -142,7 +143,7 @@ namespace EventWay.Test.Core
 
             public TestState State;
 
-            public TestAggregate()
+            public TestAggregate(Guid id) : base(id)
             {
                 State = new TestState();
 

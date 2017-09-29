@@ -1,5 +1,6 @@
 ﻿using EventWay.Core;
 using NUnit.Framework;
+using System;
 
 namespace EventWay.Test.Core
 {
@@ -12,7 +13,7 @@ namespace EventWay.Test.Core
         public void ShouldSuccesfullyInvokeTheAggregatesWhenMethod()
         {
             // ARRANGE
-            var testAggregate = new TestAggregate();
+            var testAggregate = new UnitTestAggregate(Guid.NewGuid());
 
             // ACT
             testAggregate.PublishTestEvent();
@@ -28,8 +29,12 @@ namespace EventWay.Test.Core
             public string DummyPayload { get; set; }
         }
 
-        public class TestAggregate : Aggregate
+        public class UnitTestAggregate : Aggregate
         {
+            public UnitTestAggregate(Guid id) : base(id)
+            {
+                OnEvent<TestEvent>(When);
+            }
             public void PublishTestEvent()
             {
                 var testEvent = new TestEvent()

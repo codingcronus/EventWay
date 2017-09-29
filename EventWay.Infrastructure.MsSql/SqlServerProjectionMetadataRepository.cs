@@ -11,29 +11,9 @@ namespace EventWay.Infrastructure.MsSql
 
         private readonly string _connectionString;
 
-        public SqlServerProjectionMetadataRepository(string connectionString, bool createProjectionMetadataTable = false)
+        public SqlServerProjectionMetadataRepository(string connectionString)
         {
-            if (connectionString == null)
-                throw new ArgumentNullException(nameof(connectionString));
-
-            _connectionString = connectionString;
-
-            if (createProjectionMetadataTable)
-            {
-                //TODO: Create Projection Metadata Table
-                /*
-                 CREATE TABLE ProjectionMetadata(
-                        ProjectionType nvarchar(200) not null,
-                        ProjectionId uniqueidentifier not null,
-		                EventOffset bigint not null,
-                        Constraint PKProjectionMetadata PRIMARY KEY(ProjectionId)
-                    )
-
-                CREATE INDEX Idx_ProjectionMetadata_ProjectionId
-                ON ProjectionMetadata(ProjectionId)
-                GO
-                 */
-            }
+            _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
         }
 
         public void ResetOffsets()
@@ -79,8 +59,7 @@ namespace EventWay.Infrastructure.MsSql
                 {
                     conn.Open();
 
-                    const string sql =
-                        @"INSERT INTO ProjectionMetadata (ProjectionType, ProjectionId, EventOffset) VALUES (@ProjectionType, @ProjectionId, @EventOffset)";
+                    const string sql = @"INSERT INTO ProjectionMetadata (ProjectionType, ProjectionId, EventOffset) VALUES (@ProjectionType, @ProjectionId, @EventOffset)";
 
                     var projectionMetadata = new
                     {
@@ -103,17 +82,6 @@ namespace EventWay.Infrastructure.MsSql
             {
                 Console.WriteLine(e);
                 throw;
-            }
-        }
-
-        public void ClearProjections()
-        {
-            using (var conn = new SqlConnection(_connectionString))
-            {
-                conn.Open();
-
-                const string sql = @"UPDATE ProjectionMetadata SET EventOffset = 0";
-                conn.Execute(sql, commandTimeout: CommandTimeout);
             }
         }
     }

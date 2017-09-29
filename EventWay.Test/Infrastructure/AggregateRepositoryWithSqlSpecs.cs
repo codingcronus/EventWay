@@ -2,6 +2,7 @@
 using EventWay.Infrastructure;
 using EventWay.Infrastructure.MsSql;
 using NUnit.Framework;
+using System;
 
 namespace EventWay.Test.Infrastructure
 {
@@ -12,7 +13,7 @@ namespace EventWay.Test.Infrastructure
         public void ShouldSuccesfullyPersistAndHydrateEventsFromAggregate()
         {
             // ARRANGE
-            var testAggregate = new TestAggregate();
+            var testAggregate = new TestAggregate(Guid.NewGuid());
 
             var connectionString = "Data Source=localhost;Initial Catalog=vanda-db-dev;Integrated Security=True;Connect Timeout=15;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
             var sqlEventsRepository = new SqlServerEventRepository(connectionString);
@@ -40,6 +41,11 @@ namespace EventWay.Test.Infrastructure
 
         public class TestAggregate : Aggregate
         {
+            public TestAggregate(Guid id) : base(id)
+            {
+
+            }
+
             public void PublishTestEvent()
             {
                 var testEvent = new TestEvent()

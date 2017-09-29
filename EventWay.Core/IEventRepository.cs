@@ -5,8 +5,7 @@ namespace EventWay.Core
 {
     public interface IEventRepository
     {
-        List<OrderedEventPayload> GetEvents();
-        List<OrderedEventPayload> GetEvents(long from);
+        List<OrderedEventPayload> GetEvents<TAggregate>(long from) where TAggregate : Aggregate;
 
         List<OrderedEventPayload> GetEventsByAggregateId(Guid aggregateId);
         List<OrderedEventPayload> GetEventsByAggregateId(long from, Guid aggregateId);

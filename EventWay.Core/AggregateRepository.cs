@@ -11,11 +11,8 @@ namespace EventWay.Core
 
         public AggregateRepository(IEventRepository eventRepository, IAggregateFactory aggregateFactory)
         {
-            if (eventRepository == null) throw new ArgumentNullException(nameof(eventRepository));
-            if (aggregateFactory == null) throw new ArgumentNullException(nameof(aggregateFactory));
-
-            _eventRepository = eventRepository;
-            _aggregateFactory = aggregateFactory;
+            _eventRepository = eventRepository ?? throw new ArgumentNullException(nameof(eventRepository));
+            _aggregateFactory = aggregateFactory ?? throw new ArgumentNullException(nameof(aggregateFactory));
         }
 
         public T GetById<T>(Guid aggregateId) where T : IAggregate

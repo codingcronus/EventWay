@@ -16,9 +16,9 @@ namespace EventWay.Core
         private readonly Dictionary<Type, Func<object, object>> _commandHandlers;
         private readonly Dictionary<Type, Action<object>> _eventHandlers;
 
-        protected Aggregate(Guid? id = null)
+        protected Aggregate(Guid id)
         {
-            Id = id ?? CombGuid.Generate();
+            Id = id;
 
             _uncommittedEvents = new List<object>();
 

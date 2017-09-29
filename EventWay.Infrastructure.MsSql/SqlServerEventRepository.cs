@@ -13,58 +13,19 @@ namespace EventWay.Infrastructure.MsSql
 
         private readonly string _connectionString;
 
-        public SqlServerEventRepository(string connectionString, bool createEventsTable = false)
+        public SqlServerEventRepository(string connectionString)
         {
-            if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
-
-            _connectionString = connectionString;
-
-            if (createEventsTable)
-            {
-                //TODO: Create Events Table
-                /*
-                 CREATE TABLE Events(
-                        Ordering bigint not null IDENTITY(1,1) PRIMARY KEY,
-		                EventId uniqueidentifier not null,
-		                Created datetime not null,
-                        EventType nvarchar(100) not null,
-                        AggregateType nvarchar(100) not null,
-                        AggregateId uniqueidentifier not null,
-                        Version int not null,
-                        Payload nvarchar(MAX) not null,
-                        MetaData nvarchar(MAX) null,
-                        Dispatched bit not null default(0),
-                        Constraint AK_EventId UNIQUE(EventId)
-                    )
-
-
-                CREATE INDEX Idx_Events_EventType
-                ON Events(EventType)
-                GO
-
-                CREATE INDEX Idx_Events_AggregateId
-                ON Events(AggregateId)
-                GO
-
-                CREATE INDEX Idx_Events_Dispatched
-                ON Events(Dispatched)
-                GO
-                 */
-            }
+            _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
         }
 
-        public List<OrderedEventPayload> GetEvents()
-        {
-            return GetEvents(0L);
-        }
-
-        public List<OrderedEventPayload> GetEvents(long from)
+        public List<OrderedEventPayload> GetEvents<TAggregate>(long from) where TAggregate : Aggregate
         {
             using (var conn = new SqlConnection(_connectionString))
             {
-                const string sql = "SELECT * FROM Events WHERE Ordering > @from";
+                var aggregateType = typeof(TAggregate).Name;
+                const string sql = "SELECT * FROM Events WHERE AggregateType = @aggregateType AND Ordering > @from";
 
-                var listOfEventData = conn.Query<Event>(sql, new { from }, commandTimeout: CommandTimeout);
+                var listOfEventData = conn.Query<Event>(sql, new { aggregateType, from }, commandTimeout: CommandTimeout);
 
                 var events = listOfEventData
                     .Select(x => x.DeserializeOrderedEvent())
@@ -73,6 +34,22 @@ namespace EventWay.Infrastructure.MsSql
                 return events;
             }
         }
+
+        //public List<OrderedEventPayload> GetEvents(long from)
+        //{
+        //    using (var conn = new SqlConnection(_connectionString))
+        //    {
+        //        const string sql = "SELECT * FROM Events WHERE Ordering > @from";
+
+        //        var listOfEventData = conn.Query<Event>(sql, new { from }, commandTimeout: CommandTimeout);
+
+        //        var events = listOfEventData
+        //            .Select(x => x.DeserializeOrderedEvent())
+        //            .ToList();
+
+        //        return events;
+        //    }
+        //}
 
         public List<OrderedEventPayload> GetEventsByAggregateId(Guid aggregateId)
         {

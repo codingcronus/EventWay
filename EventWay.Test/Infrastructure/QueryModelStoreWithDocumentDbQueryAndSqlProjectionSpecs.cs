@@ -33,7 +33,7 @@ namespace EventWay.Test.Infrastructure
             queryModelRepository.Initialize();
 
             // Projection Metadata Repository (MSSQL);
-            var projectionMetadataRepository = new SqlServerProjectionMetadataRepository(_sqlConnectionString, createProjectionMetadataTable: true);
+            var projectionMetadataRepository = new SqlServerProjectionMetadataRepository(_sqlConnectionString);
             projectionMetadataRepository.InitializeProjection(projectionId, projectionType);
 
             // Dummy Query Model

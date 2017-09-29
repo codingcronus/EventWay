@@ -18,6 +18,7 @@ namespace EventWay.Test.Infrastructure
         private readonly string _authKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
 
         [Test]
+        [Order(0)]
         public void ShouldSuccesfullyInitializeDatabaseAndCollection()
         {
             // ARRANGE
@@ -30,6 +31,7 @@ namespace EventWay.Test.Infrastructure
         }
 
         [Test]
+        [Order(1)]
         public async Task ShouldSuccesfullyCreateAndHydrateQueryModel()
         {
             // ARRANGE
@@ -50,6 +52,7 @@ namespace EventWay.Test.Infrastructure
         }
 
         [Test]
+        [Order(2)]
         public async Task ShouldSuccesfullyGetPagedList()
         {
             var repository = new DocumentDbQueryModelRepository(_database, _collection, _offerThroughput, _endpoint, _authKey);

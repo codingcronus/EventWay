@@ -5,6 +5,7 @@ using EventWay.Core;
 using EventWay.Query;
 using EventWay.SampleApp.Application.QueryModels;
 using EventWay.SampleApp.Core.Events;
+using EventWay.SampleApp.Core;
 
 namespace EventWay.SampleApp.Application.Projections
 {
@@ -40,7 +41,7 @@ namespace EventWay.SampleApp.Application.Projections
             // TODO: Add your events of interest here...
 
             // Process events for User aggregate
-            ProcessEvents().Wait();
+            ProcessEvents<User>().Wait();
         }
 
         private async Task Handle(UserRegistered @event, QueryModelStore queryModelStore)
