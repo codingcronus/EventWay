@@ -12,7 +12,8 @@ namespace EventWay.Query
         public string AggregateId { get; set; } //TODO: Setter should be private, but in that case DocumentDB can't hydrate it
 
         // Avoid to update by AutoMapper
-        public string id { get { return GetType().Name + "-" + AggregateId; } }
+        public string id { get { return Type + "-" + AggregateId; } }
+        public string partitionKey { get; set; }
         public string Type => GetType().Name;
     }
 }

@@ -15,17 +15,12 @@ namespace EventWay.Query
             IQueryModelRepository queryModelRepository,
             IProjectionMetadataRepository projectionMetadataRepository)
         {
-            if (eventRepository == null) throw new ArgumentNullException(nameof(eventRepository));
-            if (eventListener == null) throw new ArgumentNullException(nameof(eventListener));
-            if (queryModelRepository == null) throw new ArgumentNullException(nameof(queryModelRepository));
-            if (projectionMetadataRepository == null) throw new ArgumentNullException(nameof(projectionMetadataRepository));
-
             _projectionId = projectionId;
 
-            _eventRepository = eventRepository;
-            _eventListener = eventListener;
-            QueryModelRepository = queryModelRepository;
-            _projectionMetadataRepository = projectionMetadataRepository;
+            _eventRepository = eventRepository ?? throw new ArgumentNullException(nameof(eventRepository));
+            _eventListener = eventListener ?? throw new ArgumentNullException(nameof(eventListener));
+            QueryModelRepository = queryModelRepository ?? throw new ArgumentNullException(nameof(queryModelRepository));
+            _projectionMetadataRepository = projectionMetadataRepository ?? throw new ArgumentNullException(nameof(projectionMetadataRepository));
 
             _eventHandlers = new Dictionary<Type, Func<object, QueryModelStore, Task>>();
         }
@@ -101,6 +96,10 @@ namespace EventWay.Query
 
             // Get event source from Aggregate
             var lastProcessedOffset = projectionMeta.EventOffset;
+            if (lastProcessedOffset <= 0)
+            {
+                return;
+            }
 
             // Get all events since lastProcessedOffset belongs to Aggregate
             var events = _eventRepository.GetEvents<TAggregate>(lastProcessedOffset);

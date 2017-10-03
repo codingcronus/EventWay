@@ -61,6 +61,7 @@ namespace EventWay.SampleApp
             var cosmosDbDatabaseId = "eventway-sample-db";
             var cosmosDbCollectionId = "projections";
             var offerThroughput = 10000;
+            var noOfPartitions = 1000;
 
             // Event Repository
             var eventRepository = new SqlServerEventRepository(eventDatabaseConnectionString);
@@ -69,7 +70,8 @@ namespace EventWay.SampleApp
             var projectionMetadataRepository = new SqlServerProjectionMetadataRepository(projectionMetadataDatabaseConnectionString);
 
             // Query Model Repository
-            var queryModelRepository = new DocumentDbQueryModelRepository(cosmosDbDatabaseId, cosmosDbCollectionId, offerThroughput, cosmosDbEndpoint, cosmosDbAuthKey);
+            var queryModelRepository = new DocumentDbQueryModelRepository(cosmosDbDatabaseId, cosmosDbCollectionId,
+                offerThroughput, noOfPartitions, cosmosDbEndpoint, cosmosDbAuthKey);
             queryModelRepository.Initialize();
 
             // Event Listener

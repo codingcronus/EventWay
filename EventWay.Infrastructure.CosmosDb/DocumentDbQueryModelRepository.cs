@@ -12,29 +12,32 @@ namespace EventWay.Infrastructure.CosmosDb
 {
     public class DocumentDbQueryModelRepository : IQueryModelRepository
     {
+        private const string PartitionKeyPath = "/partitionKey";
+
         private readonly string _databaseId;
         private readonly string _collectionId;
         private readonly int _offerThroughput;
+        private readonly int _noOfPartitions;
         private readonly string _endpoint;
         private readonly string _authKey;
-        //private readonly IReliableReadWriteDocumentClient _client;
         private DocumentClient _client;
 
-        public DocumentDbQueryModelRepository(string database, string collection, int offerThroughput, string endpoint, string authKey)
+        public DocumentDbQueryModelRepository(string database, string collection, int offerThroughput, int noOfPartitions, string endpoint, string authKey)
         {
             _databaseId = database;
             _collectionId = collection;
             _offerThroughput = offerThroughput;
+            _noOfPartitions = noOfPartitions;
             _endpoint = endpoint;
             _authKey = authKey;
 
-            _client = new DocumentClient(new Uri(_endpoint), _authKey,
-               new ConnectionPolicy
-               {
-                   EnableEndpointDiscovery = false
-               }
-            );
-            //.AsReliable(new FixedInterval(10, TimeSpan.FromSeconds(1)));
+            CreateClient();
+        }
+
+        private void CreateClient()
+        {
+            var policy = new ConnectionPolicy { EnableEndpointDiscovery = false };
+            _client = new DocumentClient(new Uri(_endpoint), _authKey, policy);
         }
 
         public void Initialize()
@@ -43,21 +46,21 @@ namespace EventWay.Infrastructure.CosmosDb
             CreateCollectionIfNotExistsAsync().Wait();
         }
 
+        public async Task Save(QueryModel queryModel)
+        {
+            if (string.IsNullOrEmpty(queryModel.partitionKey))
+            {
+                queryModel.partitionKey = PartitionKeyGenerator.Generate(queryModel.AggregateId, _noOfPartitions);
+            }
+            await _client.UpsertDocumentAsync(GetCollectionUri(), queryModel, null, disableAutomaticIdGeneration: true);
+        }
+
         public async Task DeleteById<T>(Guid id) where T : QueryModel
         {
-            try
-            {
-                var modelId = typeof(T).Name + "-" + id;
+            var modelId = typeof(T).Name + "-" + id;
+            var options = CreateRequestOptions(id);
 
-                var response = await _client.DeleteDocumentAsync(GetDocumentUri(modelId));
-            }
-            catch (DocumentClientException e)
-            {
-                if (e.StatusCode == System.Net.HttpStatusCode.NotFound)
-                    return;
-
-                throw;
-            }
+            await _client.DeleteDocumentAsync(GetDocumentUri(modelId), options);
         }
 
         public async Task<T> GetById<T>(Guid id) where T : QueryModel
@@ -65,9 +68,10 @@ namespace EventWay.Infrastructure.CosmosDb
             try
             {
                 var modelId = typeof(T).Name + "-" + id;
+                var options = CreateRequestOptions(id);
 
-                Document document = await _client.ReadDocumentAsync(GetDocumentUri(modelId));
-                return (T)(dynamic)document;
+                var document = await _client.ReadDocumentAsync(GetDocumentUri(modelId), options);
+                return (T)(dynamic)document.Resource;
             }
             catch (DocumentClientException e)
             {
@@ -78,11 +82,22 @@ namespace EventWay.Infrastructure.CosmosDb
             }
         }
 
+        private RequestOptions CreateRequestOptions(Guid id)
+        {
+            var key = PartitionKeyGenerator.Generate(id.ToString(), _noOfPartitions);
+
+            var options = new RequestOptions()
+            {
+                PartitionKey = new PartitionKey(key)
+            };
+
+            return options;
+        }
+
         public async Task<IEnumerable<T>> GetAll<T>() where T : QueryModel
         {
-            var query = _client.CreateDocumentQuery<T>(
-                GetCollectionUri(),
-                new FeedOptions { MaxItemCount = -1 })
+            var options = CreateFeedOptions(-1);
+            var query = _client.CreateDocumentQuery<T>(GetCollectionUri(), options)
                 .Where(x => x.Type == typeof(T).Name)
                 .AsDocumentQuery();
 
@@ -97,9 +112,8 @@ namespace EventWay.Infrastructure.CosmosDb
 
         public async Task<IEnumerable<T>> GetAll<T>(Expression<Func<T, bool>> predicate) where T : QueryModel
         {
-            var query = _client.CreateDocumentQuery<T>(
-                GetCollectionUri(),
-                new FeedOptions { MaxItemCount = -1 })
+            var options = CreateFeedOptions(-1);
+            var query = _client.CreateDocumentQuery<T>(GetCollectionUri(), options)
                 .Where(x => x.Type == typeof(T).Name)
                 .Where(predicate)
                 .AsDocumentQuery();
@@ -120,11 +134,7 @@ namespace EventWay.Infrastructure.CosmosDb
 
         public async Task<PagedResult<T>> GetPagedListAsync<T>(PagedQuery pagedQuery, Expression<Func<T, bool>> predicate) where T : QueryModel
         {
-            var options = new FeedOptions
-            {
-                MaxItemCount = pagedQuery.MaxItemCount
-            };
-
+            var options = CreateFeedOptions(pagedQuery.MaxItemCount);
             if (!string.IsNullOrEmpty(pagedQuery.ContinuationToken))
             {
                 options.RequestContinuation = pagedQuery.ContinuationToken;
@@ -147,7 +157,9 @@ namespace EventWay.Infrastructure.CosmosDb
         public async Task<int> QueryCountAsync<T>()
         {
             var sqlQuery = string.Format("SELECT VALUE COUNT(1) FROM c WHERE c.Type = \"{0}\"", typeof(T).Name);
-            var countQuery = _client.CreateDocumentQuery<int>(GetCollectionUri(), sqlQuery).AsDocumentQuery();
+
+            var options = CreateFeedOptions(1);
+            var countQuery = _client.CreateDocumentQuery<int>(GetCollectionUri(), sqlQuery, options).AsDocumentQuery();
 
             var results = await countQuery.ExecuteNextAsync<int>();
 
@@ -156,41 +168,43 @@ namespace EventWay.Infrastructure.CosmosDb
 
         public async Task<T> QueryItemAsync<T>(Expression<Func<T, bool>> predicate) where T : QueryModel
         {
-            var query = _client.CreateDocumentQuery<T>(
-                GetCollectionUri(),
-                new FeedOptions { MaxItemCount = 1 })
+            var options = CreateFeedOptions(1);
+            var query = _client.CreateDocumentQuery<T>(GetCollectionUri(), options)
                 .Where(x => x.Type == typeof(T).Name)
                 .Where(predicate)
                 .AsDocumentQuery();
 
             if (query.HasMoreResults)
             {
-                //var dynamicResult = await (dynamic)query.ExecuteNextAsync().Result;
-
-                //var results = (T) dynamicResults;
-
                 var results = await query.ExecuteNextAsync<T>();
-
-                return results.FirstOrDefault<T>();
+                return results.FirstOrDefault();
             }
 
             return null;
+        }
+
+        private FeedOptions CreateFeedOptions(int maxItemCount)
+        {
+            return new FeedOptions
+            {
+                MaxItemCount = maxItemCount,
+                EnableCrossPartitionQuery = true,
+                MaxDegreeOfParallelism = -1,
+                MaxBufferedItemCount = -1
+            };
         }
 
         public async Task<bool> DoesItemExist<T>(Guid id)
         {
             var modelId = typeof(T).Name + "-" + id;
             var sqlQuery = string.Format("SELECT VALUE COUNT(1) FROM c WHERE c.id = \"{0}\"", modelId);
-            var countQuery = _client.CreateDocumentQuery<int>(GetCollectionUri(), sqlQuery).AsDocumentQuery();
+
+            var options = CreateFeedOptions(1);
+            var countQuery = _client.CreateDocumentQuery<int>(GetCollectionUri(), sqlQuery, options).AsDocumentQuery();
 
             var results = await countQuery.ExecuteNextAsync<int>();
 
             return results.Count > 0 && results.FirstOrDefault() > 0;
-        }
-
-        public async Task Save(QueryModel queryModel)
-        {
-            await _client.UpsertDocumentAsync(GetCollectionUri(), queryModel, null, disableAutomaticIdGeneration: true);
         }
 
         // Utility Methods
@@ -216,12 +230,7 @@ namespace EventWay.Infrastructure.CosmosDb
             // Refresh document client session
             _client.Dispose();
 
-            _client = new DocumentClient(new Uri(_endpoint), _authKey,
-                new ConnectionPolicy
-                {
-                    EnableEndpointDiscovery = false
-                }
-            );
+            CreateClient();
 
             await CreateCollectionIfNotExistsAsync();
         }
@@ -236,10 +245,12 @@ namespace EventWay.Infrastructure.CosmosDb
             {
                 if (e.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
-                    await _client.CreateDocumentCollectionAsync(
-                        UriFactory.CreateDatabaseUri(_databaseId),
-                        new DocumentCollection { Id = _collectionId },
-                        new RequestOptions { OfferThroughput = _offerThroughput });
+                    var database = UriFactory.CreateDatabaseUri(_databaseId);
+                    var collection = new DocumentCollection { Id = _collectionId };
+                    collection.PartitionKey.Paths.Add(PartitionKeyPath);
+
+                    var options = new RequestOptions { OfferThroughput = _offerThroughput };
+                    await _client.CreateDocumentCollectionAsync(database, collection, options);
                 }
                 else
                 {
