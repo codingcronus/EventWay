@@ -48,10 +48,7 @@ namespace EventWay.Infrastructure.CosmosDb
 
         public async Task Save(QueryModel queryModel)
         {
-            if (string.IsNullOrEmpty(queryModel.partitionKey))
-            {
-                queryModel.partitionKey = PartitionKeyGenerator.Generate(queryModel.AggregateId, _noOfPartitions);
-            }
+            queryModel.partitionKey = PartitionKeyGenerator.Generate(queryModel.AggregateId, _noOfPartitions);
             await _client.UpsertDocumentAsync(GetCollectionUri(), queryModel, null, disableAutomaticIdGeneration: true);
         }
 
