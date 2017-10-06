@@ -4,15 +4,15 @@ namespace EventWay.Query
 {
     public abstract class QueryModel
     {
-        protected QueryModel(Guid aggregateId)
+        protected QueryModel(Guid id)
         {
-            AggregateId = aggregateId.ToString();
+            //AggregateId = aggregateId;
+            this.id = id;
         }
 
-        public string AggregateId { get; set; } //TODO: Setter should be private, but in that case DocumentDB can't hydrate it
-
-        // Avoid to update by AutoMapper
-        public string id { get { return Type + "-" + AggregateId; } }
+        //public Guid AggregateId { get; private set; }
+        //public Guid id { get { return AggregateId; } }
+        public Guid id { get; set; }
         public string partitionKey { get; set; }
         public string Type => GetType().Name;
     }

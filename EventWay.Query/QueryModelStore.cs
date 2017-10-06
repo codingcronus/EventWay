@@ -54,7 +54,7 @@ namespace EventWay.Query
 
         public async Task DeleteQueryModel<T>(T queryModel) where T : QueryModel
         {
-            await _queryModelRepository.DeleteById<T>(Guid.Parse(queryModel.AggregateId));
+            await _queryModelRepository.DeleteById<T>(queryModel.id);
 
             AcknowledgeEvent();
         }

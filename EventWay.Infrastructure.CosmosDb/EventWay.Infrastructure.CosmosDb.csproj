@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DocumentDbQueryModelRepository.cs" />
+    <Compile Include="DocumentDbRetryHelper.cs" />
     <Compile Include="PartitionKeyGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

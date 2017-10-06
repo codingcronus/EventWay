@@ -29,7 +29,7 @@ namespace EventWay.SampleApp.Application
             // Check if user already exists
             var existingUser = await _queryModelRepository.QueryItemAsync<UserQueryModel>(x => x.DisplayName == $"{command.FirstName} {command.LastName}");
             if (existingUser != null)
-                return Guid.Parse(existingUser.AggregateId);
+                return existingUser.id;
 
             // Create aggregate
             var newUserId = Guid.NewGuid();

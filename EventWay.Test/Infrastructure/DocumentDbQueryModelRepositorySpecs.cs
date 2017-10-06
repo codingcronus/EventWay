@@ -49,7 +49,7 @@ namespace EventWay.Test.Infrastructure
             // ASSERT
             Assert.IsTrue(existing);
             Assert.IsNotNull(hydratedQueryModel);
-            Assert.AreEqual(queryModelId.ToString(), hydratedQueryModel.AggregateId);
+            Assert.AreEqual(queryModelId, hydratedQueryModel.id);
             Assert.AreEqual("Hello Integration Test!", testQueryModel.DummyPayload);
             Assert.AreEqual(testQueryModel.DummyPayload, hydratedQueryModel.DummyPayload);
         }

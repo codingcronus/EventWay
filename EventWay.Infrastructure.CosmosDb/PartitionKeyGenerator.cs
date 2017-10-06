@@ -12,9 +12,9 @@ namespace EventWay.Infrastructure.CosmosDb
             _md5 = MD5.Create();
         }
 
-        internal static string Generate(string id, int noOfPartitions)
+        internal static string Generate(Guid id, int noOfPartitions)
         {
-            var hashedValue = _md5.ComputeHash(Encoding.UTF8.GetBytes(id));
+            var hashedValue = _md5.ComputeHash(Encoding.UTF8.GetBytes(id.ToString()));
             var asInt = BitConverter.ToInt32(hashedValue, 0);
             asInt = asInt == int.MinValue ? asInt + 1 : asInt;
 

@@ -48,26 +48,28 @@ namespace EventWay.Infrastructure.CosmosDb
 
         public async Task Save(QueryModel queryModel)
         {
-            queryModel.partitionKey = PartitionKeyGenerator.Generate(queryModel.AggregateId, _noOfPartitions);
-            await _client.UpsertDocumentAsync(GetCollectionUri(), queryModel, null, disableAutomaticIdGeneration: true);
+            queryModel.partitionKey = PartitionKeyGenerator.Generate(queryModel.id, _noOfPartitions);
+            await DocumentDbRetryPolicy.ExecuteWithRetries(
+                () => _client.UpsertDocumentAsync(GetCollectionUri(), queryModel, null, disableAutomaticIdGeneration: true)
+                );
         }
 
         public async Task DeleteById<T>(Guid id) where T : QueryModel
         {
-            var modelId = typeof(T).Name + "-" + id;
             var options = CreateRequestOptions(id);
 
-            await _client.DeleteDocumentAsync(GetDocumentUri(modelId), options);
+            await DocumentDbRetryPolicy.ExecuteWithRetries(
+                () => _client.DeleteDocumentAsync(GetDocumentUri(id), options)
+                );
         }
 
         public async Task<T> GetById<T>(Guid id) where T : QueryModel
         {
             try
             {
-                var modelId = typeof(T).Name + "-" + id;
                 var options = CreateRequestOptions(id);
 
-                var document = await _client.ReadDocumentAsync(GetDocumentUri(modelId), options);
+                var document = await _client.ReadDocumentAsync(GetDocumentUri(id), options);
                 return (T)(dynamic)document.Resource;
             }
             catch (DocumentClientException e)
@@ -81,7 +83,7 @@ namespace EventWay.Infrastructure.CosmosDb
 
         private RequestOptions CreateRequestOptions(Guid id)
         {
-            var key = PartitionKeyGenerator.Generate(id.ToString(), _noOfPartitions);
+            var key = PartitionKeyGenerator.Generate(id, _noOfPartitions);
 
             var options = new RequestOptions()
             {
@@ -193,8 +195,7 @@ namespace EventWay.Infrastructure.CosmosDb
 
         public async Task<bool> DoesItemExist<T>(Guid id)
         {
-            var modelId = typeof(T).Name + "-" + id;
-            var sqlQuery = string.Format("SELECT VALUE COUNT(1) FROM c WHERE c.id = \"{0}\"", modelId);
+            var sqlQuery = string.Format("SELECT VALUE COUNT(1) FROM c WHERE c.id = \"{0}\"", id);
 
             var options = CreateFeedOptions(1);
             var countQuery = _client.CreateDocumentQuery<int>(GetCollectionUri(), sqlQuery, options).AsDocumentQuery();
@@ -256,9 +257,9 @@ namespace EventWay.Infrastructure.CosmosDb
             }
         }
 
-        private Uri GetDocumentUri(string id)
+        private Uri GetDocumentUri(Guid id)
         {
-            return UriFactory.CreateDocumentUri(_databaseId, _collectionId, id);
+            return UriFactory.CreateDocumentUri(_databaseId, _collectionId, id.ToString());
         }
 
         private Uri GetCollectionUri()
