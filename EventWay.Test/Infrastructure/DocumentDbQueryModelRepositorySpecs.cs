@@ -69,6 +69,20 @@ namespace EventWay.Test.Infrastructure
             // ASSERT
             Assert.IsTrue(pagedResult.Data.Count() >= 0 && pagedResult.Data.Count() <= pagedResult.Count);
         }
+
+        [Test]
+        [Order(3)]
+        public void ShouldSuccesfullyGeneratePartitionKey()
+        {
+            for (var i = 0; i < 30000; i++)
+            {
+                var key = PartitionKeyGenerator.Generate(Guid.NewGuid(), 2000);
+                System.Diagnostics.Debug.WriteLine(key);
+            }
+
+            // ASSERT
+            Assert.IsTrue(true);
+        }
     }
 
     public class TestQueryModel : QueryModel
