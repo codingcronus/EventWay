@@ -17,11 +17,11 @@ namespace EventWay.Query
         Task<PagedResult<T>> GetPagedListAsync<T>(PagedQuery pagedQuery) where T : QueryModel;
         Task<PagedResult<T>> GetPagedListAsync<T>(PagedQuery pagedQuery, Expression<Func<T, bool>> predicate) where T : QueryModel;
 
-        Task<int> QueryCountAsync<T>();
+        Task<int> QueryCountAsync<T>() where T : QueryModel;
 
         Task<T> QueryItemAsync<T>(Expression<Func<T, bool>> predicate) where T : QueryModel;
 
-        Task<bool> DoesItemExist<T>(Guid id);
+        Task<bool> DoesItemExist<T>(Guid id) where T : QueryModel;
 
         Task DeleteById<T>(Guid id) where T : QueryModel;
 

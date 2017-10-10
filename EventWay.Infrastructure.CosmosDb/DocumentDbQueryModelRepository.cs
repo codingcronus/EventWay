@@ -65,6 +65,13 @@ namespace EventWay.Infrastructure.CosmosDb
 
         public async Task<T> GetById<T>(Guid id) where T : QueryModel
         {
+            return await DocumentDbRetryPolicy.ExecuteWithRetries(
+                () => GetByIdInternal<T>(id)
+                );
+        }
+
+        public async Task<T> GetByIdInternal<T>(Guid id) where T : QueryModel
+        {
             try
             {
                 var options = CreateRequestOptions(id);
@@ -133,6 +140,13 @@ namespace EventWay.Infrastructure.CosmosDb
 
         public async Task<PagedResult<T>> GetPagedListAsync<T>(PagedQuery pagedQuery, Expression<Func<T, bool>> predicate) where T : QueryModel
         {
+            return await DocumentDbRetryPolicy.ExecuteWithRetries(
+              () => GetPagedListAsyncInternal<T>(pagedQuery, predicate)
+              );
+        }
+
+        private async Task<PagedResult<T>> GetPagedListAsyncInternal<T>(PagedQuery pagedQuery, Expression<Func<T, bool>> predicate) where T : QueryModel
+        {
             var options = CreateFeedOptions(pagedQuery.MaxItemCount);
             if (!string.IsNullOrEmpty(pagedQuery.ContinuationToken))
             {
@@ -148,24 +162,33 @@ namespace EventWay.Infrastructure.CosmosDb
 
             var results = await query.AsDocumentQuery().ExecuteNextAsync<T>();
 
-            var count = await QueryCountAsync<T>();
+            var count = await QueryCountAsyncInternal<T>();
 
             return new PagedResult<T>(results.ToList().AsReadOnly(), count, results.ResponseContinuation);
         }
 
-        public async Task<int> QueryCountAsync<T>()
+        public async Task<int> QueryCountAsync<T>() where T : QueryModel
         {
-            var sqlQuery = string.Format("SELECT VALUE COUNT(1) FROM c WHERE c.Type = \"{0}\"", typeof(T).Name);
+            return await DocumentDbRetryPolicy.ExecuteWithRetries(
+              () => QueryCountAsyncInternal<T>()
+              );
+        }
 
+        private async Task<int> QueryCountAsyncInternal<T>() where T : QueryModel
+        {
             var options = CreateFeedOptions(1);
-            var countQuery = _client.CreateDocumentQuery<int>(GetCollectionUri(), sqlQuery, options).AsDocumentQuery();
-
-            var results = await countQuery.ExecuteNextAsync<int>();
-
-            return results.FirstOrDefault();
+            var countQuery = _client.CreateDocumentQuery<T>(GetCollectionUri(), options);
+            return await countQuery.CountAsync();
         }
 
         public async Task<T> QueryItemAsync<T>(Expression<Func<T, bool>> predicate) where T : QueryModel
+        {
+            return await DocumentDbRetryPolicy.ExecuteWithRetries(
+               () => QueryItemAsyncInternal<T>(predicate)
+               );
+        }
+
+        private async Task<T> QueryItemAsyncInternal<T>(Expression<Func<T, bool>> predicate) where T : QueryModel
         {
             var options = CreateFeedOptions(1);
             var query = _client.CreateDocumentQuery<T>(GetCollectionUri(), options)
@@ -193,16 +216,20 @@ namespace EventWay.Infrastructure.CosmosDb
             };
         }
 
-        public async Task<bool> DoesItemExist<T>(Guid id)
+        public async Task<bool> DoesItemExist<T>(Guid id) where T : QueryModel
         {
-            var sqlQuery = string.Format("SELECT VALUE COUNT(1) FROM c WHERE c.id = \"{0}\"", id);
+            return await DocumentDbRetryPolicy.ExecuteWithRetries(
+                () => DoesItemExistInternal<T>(id)
+                );
+        }
 
+        private async Task<bool> DoesItemExistInternal<T>(Guid id) where T : QueryModel
+        {
             var options = CreateFeedOptions(1);
-            var countQuery = _client.CreateDocumentQuery<int>(GetCollectionUri(), sqlQuery, options).AsDocumentQuery();
+            var countQuery = _client.CreateDocumentQuery<T>(GetCollectionUri(), options).Where(p => p.id == id);
+            var count = await countQuery.CountAsync();
 
-            var results = await countQuery.ExecuteNextAsync<int>();
-
-            return results.Count > 0 && results.FirstOrDefault() > 0;
+            return count > 0;
         }
 
         // Utility Methods
