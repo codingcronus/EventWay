@@ -44,6 +44,7 @@ namespace EventWay.Infrastructure.CosmosDb
         {
             CreateDatabaseIfNotExistsAsync().Wait();
             CreateCollectionIfNotExistsAsync().Wait();
+            CreateUserDefinedFunctionsIfNotExistsAsync().Wait();
         }
 
         public async Task Save(QueryModel queryModel)
@@ -282,6 +283,41 @@ namespace EventWay.Infrastructure.CosmosDb
                     throw;
                 }
             }
+        }
+
+        private async Task CreateUserDefinedFunctionsIfNotExistsAsync()
+        {
+            try
+            {
+                var userFunction = new UserDefinedFunction
+                {
+                    Id = "stringify",
+                    Body = @"function stringify(obj){
+                            if(!obj) {
+                                return ''
+                            }
+                            return JSON.stringify(obj);
+                        }"
+                };
+                await _client.CreateUserDefinedFunctionAsync(GetCollectionUri(), userFunction);
+            }
+            catch { }
+
+            try
+            {
+                var userFunction = new UserDefinedFunction
+                {
+                    Id = "array_firstOrDefault",
+                    Body = @"function array_firstOrDefault(arr){
+                            if(!arr || !arr.length) {
+                                return null;
+                            }
+                            return arr[0];
+                        }"
+                };
+                await _client.CreateUserDefinedFunctionAsync(GetCollectionUri(), userFunction);
+            }
+            catch { }
         }
 
         private Uri GetDocumentUri(Guid id)
