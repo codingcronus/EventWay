@@ -264,6 +264,8 @@ namespace EventWay.Test.Infrastructure
         public HostedTestQueryModel Hosted2 { get; set; }
         public HostedTestQueryModel Hosted3 { get; set; }
         public HostedTestQueryModel Hosted4 { get; set; }
+
+        public override string BaseType => string.Empty;
     }
 
     public class HostedTestQueryModel
