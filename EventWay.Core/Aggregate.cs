@@ -75,6 +75,7 @@ namespace EventWay.Core
             if (!_eventHandlers.ContainsKey(eventType))
             {
                 Trace.TraceWarning($"No Event Handler for type: {eventType.FullName}");
+                UnhandledEvent(@event);
                 return;
             }
 
@@ -138,6 +139,12 @@ namespace EventWay.Core
 
             return commandType;
         }
+
+        /// <summary>
+        /// If no event handler was specified for a given event type. UnhandledEvent will be called.
+        /// </summary>
+        /// <param name="event"></param>
+        protected virtual void UnhandledEvent(object @event) {}
 
         protected virtual object GetState()
         {
