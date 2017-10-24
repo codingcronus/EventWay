@@ -233,6 +233,24 @@ namespace EventWay.Infrastructure.CosmosDb
             return count > 0;
         }
 
+        public async Task<bool> DoesItemExist<T>(Expression<Func<T, bool>> predicate) where T : QueryModel
+        {
+            return await DocumentDbRetryPolicy.ExecuteWithRetries(
+                () => DoesItemExistInternal<T>(predicate)
+                );
+        }
+
+        public async Task<bool> DoesItemExistInternal<T>(Expression<Func<T, bool>> predicate) where T : QueryModel
+        {
+            var options = CreateFeedOptions(-1);
+            var query = _client.CreateDocumentQuery<T>(GetCollectionUri(), options)
+                .Where(x => x.Type == typeof(T).Name)
+                .Where(predicate);
+
+            var count = await query.CountAsync();
+            return count > 0;
+        }
+
         // Utility Methods
         private async Task CreateDatabaseIfNotExistsAsync()
         {

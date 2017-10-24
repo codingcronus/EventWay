@@ -23,6 +23,8 @@ namespace EventWay.Query
 
         Task<bool> DoesItemExist<T>(Guid id) where T : QueryModel;
 
+        Task<bool> DoesItemExistInternal<T>(Expression<Func<T, bool>> predicate) where T : QueryModel;
+
         Task DeleteById<T>(Guid id) where T : QueryModel;
 
         Task ClearCollectionAsync();
