@@ -21,7 +21,6 @@ namespace EventWay.Core
             Id = id;
 
             _uncommittedEvents = new List<object>();
-
             _commandHandlers = new Dictionary<Type, Func<object, object>>();
             _eventHandlers = new Dictionary<Type, Action<object>>();
         }
@@ -100,6 +99,18 @@ namespace EventWay.Core
             int numSnapshots = (Version - 1) / SnapshotSize;
             if ((Version - numSnapshots) % SnapshotSize == 0)
                 SaveSnapshot();
+        }
+
+        protected void Publish(object[] events)
+        {
+            foreach (var @event in events)
+                Publish(@event);
+        }
+
+        protected void Publish(IEnumerable<object> events)
+        {
+            foreach (var @event in events)
+                Publish(@event);
         }
 
         private void SaveSnapshot()
