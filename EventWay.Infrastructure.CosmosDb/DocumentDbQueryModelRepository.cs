@@ -71,7 +71,7 @@ namespace EventWay.Infrastructure.CosmosDb
                 );
         }
 
-        public async Task<T> GetByIdInternal<T>(Guid id) where T : QueryModel
+        private async Task<T> GetByIdInternal<T>(Guid id) where T : QueryModel
         {
             try
             {
@@ -240,7 +240,7 @@ namespace EventWay.Infrastructure.CosmosDb
                 );
         }
 
-        public async Task<bool> DoesItemExistInternal<T>(Expression<Func<T, bool>> predicate) where T : QueryModel
+        private async Task<bool> DoesItemExistInternal<T>(Expression<Func<T, bool>> predicate) where T : QueryModel
         {
             var options = CreateFeedOptions(-1);
             var query = _client.CreateDocumentQuery<T>(GetCollectionUri(), options)
