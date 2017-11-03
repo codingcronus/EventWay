@@ -251,8 +251,23 @@ namespace EventWay.Infrastructure.CosmosDb
             return count > 0;
         }
 
-        // Utility Methods
-        private async Task CreateDatabaseIfNotExistsAsync()
+	    public async Task<List<dynamic>> ExecuteRawSql(string sql)
+	    {
+		    return await DocumentDbRetryPolicy.ExecuteWithRetries(
+			    () => ExecuteRawSqlInternal(sql)
+			    );
+	    }
+
+	    private async Task<List<dynamic>> ExecuteRawSqlInternal(string sql)
+	    {
+			var options = CreateFeedOptions(-1);
+		    var query = _client.CreateDocumentQuery<dynamic>(GetCollectionUri(), sql, options).AsDocumentQuery();
+		    var result = await query.ExecuteNextAsync<dynamic>();
+            return result.ToList();
+        }
+
+		// Utility Methods
+		private async Task CreateDatabaseIfNotExistsAsync()
         {
             try
             {

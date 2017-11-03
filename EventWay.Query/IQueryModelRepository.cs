@@ -28,5 +28,8 @@ namespace EventWay.Query
         Task DeleteById<T>(Guid id) where T : QueryModel;
 
         Task ClearCollectionAsync();
+
+	    Task<List<dynamic>> ExecuteRawSql(string sql);
+
     }
 }
