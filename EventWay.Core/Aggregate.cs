@@ -131,13 +131,13 @@ namespace EventWay.Core
         {
             var commandType = AssertCommandHandler(command);
 
-            _commandHandlers[commandType](command);
+            if (commandType != null)
+                _commandHandlers[commandType](command);
         }
 
         public T Ask<T>(IDomainCommand command)
         {
             var commandType = AssertCommandHandler(command);
-
             return (T)_commandHandlers[commandType](command);
         }
 
@@ -146,7 +146,10 @@ namespace EventWay.Core
             // Get command type and throw error if command has no handler in aggregate
             var commandType = command.GetType();
             if (!_commandHandlers.ContainsKey(commandType))
-                throw new MissingMethodException($"Command of type {command.GetType()}. not handled");
+            {
+                UnhandledCommand(command);
+                return null;
+            }
 
             return commandType;
         }
@@ -156,6 +159,11 @@ namespace EventWay.Core
         /// </summary>
         /// <param name="event"></param>
         protected virtual void UnhandledEvent(object @event) {}
+
+        protected virtual void UnhandledCommand(object command)
+        {
+            throw new MissingMethodException($"Command of type {command.GetType()}. not handled");
+        }
 
         protected virtual object GetState()
         {
