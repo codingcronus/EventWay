@@ -36,6 +36,8 @@ namespace EventWay.Core
                 events.Select(x => x.EventPayload).ToArray()
             );
 
+            aggregate.Version = lastEventIndex ?? 0;
+
             return aggregate;
         }
 

@@ -27,7 +27,7 @@ namespace EventWay.Infrastructure
                      null);
 
             aggregate.Id = aggregateId;
-
+            
             if (events != null)
                 foreach (var @event in events)
                     aggregate.Apply(@event);

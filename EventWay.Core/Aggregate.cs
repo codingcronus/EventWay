@@ -21,7 +21,6 @@ namespace EventWay.Core
             Id = id;
 
             _uncommittedEvents = new List<object>();
-
             _commandHandlers = new Dictionary<Type, Func<object, object>>();
             _eventHandlers = new Dictionary<Type, Action<object>>();
         }
@@ -102,6 +101,18 @@ namespace EventWay.Core
                 SaveSnapshot();
         }
 
+        protected void Publish(object[] events)
+        {
+            foreach (var @event in events)
+                Publish(@event);
+        }
+
+        protected void Publish(IEnumerable<object> events)
+        {
+            foreach (var @event in events)
+                Publish(@event);
+        }
+
         private void SaveSnapshot()
         {
             var state = GetState();
@@ -120,13 +131,13 @@ namespace EventWay.Core
         {
             var commandType = AssertCommandHandler(command);
 
-            _commandHandlers[commandType](command);
+            if (commandType != null)
+                _commandHandlers[commandType](command);
         }
 
         public T Ask<T>(IDomainCommand command)
         {
             var commandType = AssertCommandHandler(command);
-
             return (T)_commandHandlers[commandType](command);
         }
 
@@ -135,7 +146,10 @@ namespace EventWay.Core
             // Get command type and throw error if command has no handler in aggregate
             var commandType = command.GetType();
             if (!_commandHandlers.ContainsKey(commandType))
-                throw new MissingMethodException($"Command of type {command.GetType()}. not handled");
+            {
+                UnhandledCommand(command);
+                return null;
+            }
 
             return commandType;
         }
@@ -145,6 +159,11 @@ namespace EventWay.Core
         /// </summary>
         /// <param name="event"></param>
         protected virtual void UnhandledEvent(object @event) {}
+
+        protected virtual void UnhandledCommand(object command)
+        {
+            throw new MissingMethodException($"Command of type {command.GetType()}. not handled");
+        }
 
         protected virtual object GetState()
         {
