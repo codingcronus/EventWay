@@ -17,13 +17,14 @@ namespace EventWay.Core
 
         public T GetById<T>(Guid aggregateId) where T : IAggregate
         {
-            var loadFromEvent = 0L;
+            var loadFromEvent = 1L;
 
             // Check for Snapshots
-            var lastEventIndex = _eventRepository.GetVersionByAggregateId(aggregateId);
+            var latestVersion = _eventRepository.GetVersionByAggregateId(aggregateId);
             var snapshotSize = _aggregateFactory.GetSnapshotSize<T>();
-            if (lastEventIndex.HasValue && lastEventIndex.Value >= snapshotSize)
-                loadFromEvent = lastEventIndex.Value - lastEventIndex.Value % (snapshotSize + 1);
+
+            if (latestVersion.HasValue && latestVersion.Value > snapshotSize)
+                loadFromEvent = latestVersion.Value - latestVersion.Value % (snapshotSize + 1);
 
             // Load events
             var events = _eventRepository.GetEventsByAggregateId(loadFromEvent, aggregateId);
@@ -36,7 +37,7 @@ namespace EventWay.Core
                 events.Select(x => x.EventPayload).ToArray()
             );
 
-            aggregate.Version = lastEventIndex ?? 0;
+            aggregate.Version = latestVersion ?? 0;
 
             return aggregate;
         }

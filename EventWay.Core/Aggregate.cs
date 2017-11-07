@@ -73,7 +73,6 @@ namespace EventWay.Core
 
             if (!_eventHandlers.ContainsKey(eventType))
             {
-                Trace.TraceWarning($"No Event Handler for type: {eventType.FullName}");
                 UnhandledEvent(@event);
                 return;
             }
@@ -96,9 +95,11 @@ namespace EventWay.Core
             if (@event is SnapshotOffer)
                 return;
 
-            int numSnapshots = (Version - 1) / SnapshotSize;
-            if ((Version - numSnapshots) % SnapshotSize == 0)
+            if ((Version + 1) % (SnapshotSize +1) == 0)
                 SaveSnapshot();
+            //int numSnapshots = (Version - 1) / SnapshotSize;
+            //if ((Version - numSnapshots) % SnapshotSize == 0)
+            //  SaveSnapshot();
         }
 
         protected void Publish(object[] events)
@@ -158,7 +159,10 @@ namespace EventWay.Core
         /// If no event handler was specified for a given event type. UnhandledEvent will be called.
         /// </summary>
         /// <param name="event"></param>
-        protected virtual void UnhandledEvent(object @event) {}
+        protected virtual void UnhandledEvent(object @event)
+        {
+            Trace.TraceWarning($"No Event Handler for type: {@event.GetType().FullName}");
+        }
 
         protected virtual void UnhandledCommand(object command)
         {
