@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.8
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventWay.Core", "EventWay.Core\EventWay.Core.csproj", "{E9944AB9-0D72-49EF-8D1A-21518A3F3CFB}"
 EndProject
@@ -21,6 +21,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F934D372-5B21-4BBC-8C4C-83C3484F900F}"
 	ProjectSection(SolutionItems) = preProject
 		create-packages.bat = create-packages.bat
+		CreateScripts.sql = CreateScripts.sql
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventWay.Infrastructure.ApplicationInsights", "EventWay.Infrastructure.ApplicationInsights\EventWay.Infrastructure.ApplicationInsights.csproj", "{96BECF10-D1D7-4B80-B982-63BA620124B8}"
@@ -90,5 +91,6 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8
+		SolutionGuid = {63E7F525-07F5-4BCD-8E18-974D37DE2D1F}
 	EndGlobalSection
 EndGlobal

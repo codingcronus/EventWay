@@ -61,6 +61,7 @@
     <Compile Include="IDomainCommand.cs" />
     <Compile Include="IEventListener.cs" />
     <Compile Include="IEventRepository.cs" />
+    <Compile Include="ISnapshotEventRepository.cs" />
     <Compile Include="OrderedEventPayload.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SnapshotOffer.cs" />

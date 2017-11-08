@@ -60,7 +60,7 @@ namespace EventWay.Infrastructure.MsSql
         {
             using (var conn = new SqlConnection(_connectionString))
             {
-                const string sql = "SELECT * FROM Events WHERE AggregateId=@aggregateId AND Version >= @from";
+                const string sql = "SELECT * FROM Events WHERE AggregateId=@aggregateId AND Version > @from";
 
                 var listOfEventData = conn.Query<Event>(sql, new { aggregateId, from }, commandTimeout: CommandTimeout);
 

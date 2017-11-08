@@ -67,7 +67,8 @@ namespace EventWay.Core
 
         public void Apply(object @event)
         {
-            Version++;
+            if (!(@event is SnapshotOffer))
+                Version++;
 
             var eventType = @event.GetType();
 
@@ -97,9 +98,6 @@ namespace EventWay.Core
 
             if ((Version + 1) % (SnapshotSize +1) == 0)
                 SaveSnapshot();
-            //int numSnapshots = (Version - 1) / SnapshotSize;
-            //if ((Version - numSnapshots) % SnapshotSize == 0)
-            //  SaveSnapshot();
         }
 
         protected void Publish(object[] events)
