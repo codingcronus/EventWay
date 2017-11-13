@@ -96,7 +96,7 @@ namespace EventWay.Core
             if (@event is SnapshotOffer)
                 return;
 
-            if ((Version + 1) % (SnapshotSize +1) == 0)
+            if (Version > 0 && Version % (SnapshotSize) == 0)
                 SaveSnapshot();
         }
 
@@ -118,9 +118,11 @@ namespace EventWay.Core
             if (state == null)
                 return;
 
-            var snapshotEvent = new SnapshotOffer()
+            var snapshotEvent = new SnapshotOffer
             {
-                State = state
+                State = state,
+                // Use the current aggregate "event version" for the snapshot version as well.
+                Version = Version
             };
 
             Publish(snapshotEvent);

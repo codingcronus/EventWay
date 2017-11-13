@@ -28,10 +28,7 @@ namespace EventWay.Core
             var eventType = @event.EventPayload.GetType();
 
             if (!_eventHandlers.ContainsKey(eventType))
-            {
-                Console.WriteLine($"Received unhandled event: {eventType.AssemblyQualifiedName}"); 
                 return;
-            }
 
             foreach (var handler in _eventHandlers[eventType])
                 await handler(@event);

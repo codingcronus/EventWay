@@ -6,7 +6,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 CREATE TABLE [dbo].[Events](
-	[Ordering] [bigint] IDENTITY(1,1) NOT NULL,
+	[Ordering] [bigint] NOT NULL,
 	[EventId] [uniqueidentifier] NOT NULL,
 	[Created] [datetime] NOT NULL,
 	[EventType] [nvarchar](450) NOT NULL,
@@ -14,8 +14,7 @@ CREATE TABLE [dbo].[Events](
 	[AggregateId] [uniqueidentifier] NOT NULL,
 	[Version] [int] NOT NULL,
 	[Payload] [nvarchar](max) NOT NULL,
-	[MetaData] [nvarchar](max) NULL,
-	[Dispatched] [bit] NOT NULL,
+	[MetaData] [nvarchar](max) NULL
 PRIMARY KEY CLUSTERED 
 (
 	[Ordering] ASC

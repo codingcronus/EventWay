@@ -26,7 +26,7 @@ namespace EventWay.Core
             if (deserializedPayload.GetType().IsSubclassOf(typeof(DomainEvent)))
             {
                 ((DomainEvent) deserializedPayload).AggregateId = x.AggregateId;
-                ((DomainEvent)deserializedPayload).AggregateType = x.AggregateType;
+                ((DomainEvent) deserializedPayload).AggregateType = x.AggregateType;
             }
 
             return deserializedPayload;
@@ -47,7 +47,10 @@ namespace EventWay.Core
 
             var data = JsonConvert.SerializeObject(@event, SerializerSettings);
             var eventId = CombGuid.Generate();
-            var eventType = @event.GetType().AssemblyQualifiedName;
+
+            // TODO: Do we really need AssemblyQualifiedName?
+            //var eventType = @event.GetType().AssemblyQualifiedName;
+            var eventType = @event.GetType().Name;
 
             return new Event
             {

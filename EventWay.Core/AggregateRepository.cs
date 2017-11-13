@@ -94,19 +94,22 @@ namespace EventWay.Core
             eventsToSave = new List<Event>();
             snapshotsToSave = new List<Event>();
 
-            var events = aggregate
+            var allEvents = aggregate
                 .GetUncommittedEvents()
                 .ToArray();
 
-            var aggregateType = aggregate.GetType().Name;
-            version = aggregate.Version - events.Length + 1;
+            var numberOfNonSnapshotEvents = allEvents
+                .Count(x => !(x is SnapshotOffer));
 
-            foreach (var @event in events)
+            var aggregateType = aggregate.GetType().Name;
+            version = aggregate.Version - numberOfNonSnapshotEvents + 1;
+
+            foreach (var @event in allEvents)
             {
                 // A snapshot offer has the same "version" as the last events it covers.
                 // So we do not increment the version.
-                if (@event is SnapshotOffer)
-                    snapshotsToSave.Add(@event.ToEventData(aggregateType, aggregate.Id, version));
+                if (@event is SnapshotOffer offer)
+                    snapshotsToSave.Add(@event.ToEventData(aggregateType, aggregate.Id, offer.Version));
                 else
                     eventsToSave.Add(@event.ToEventData(aggregateType, aggregate.Id, version++));
             }

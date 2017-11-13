@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using EventWay.Core;
 using EventWay.Infrastructure.MsSql;
 using NUnit.Framework;
@@ -45,6 +46,31 @@ namespace EventWay.Test.Infrastructure
             // ASSERT
             Assert.AreEqual(1, hydratedEvents.Count);
             Assert.AreEqual(typeof(SqlServerEventsRepositorySpecsTestEvent), hydratedEvents[0].EventPayload.GetType());
+        }
+
+        [Test]
+        public void ShouldUseBulkInsertWithTemporaryTable()
+        {
+            // ARRANGE
+            var connectionString = "Data Source=localhost;Initial Catalog=EventWayEvents;Integrated Security=True;Connect Timeout=15;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+            var repository = new SqlServerEventRepository(connectionString);
+
+            var testEventPayload = new SqlServerEventsRepositorySpecsTestEvent()
+            {
+                DummyPayload = "Integration Test " + CombGuid.Generate()
+            };
+
+            var aggregateId = CombGuid.Generate();
+
+            var events = Enumerable.Range(1, 10)
+                .Select(x => testEventPayload.ToEventData("TestAggregate", aggregateId, x))
+                .ToArray();
+
+            // ACT
+            var orderedEvents = repository.SaveEvents(events);
+
+            // ASSERT
+            Assert.AreEqual(events.Length, orderedEvents.Length);
         }
     }
 

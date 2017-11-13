@@ -62,6 +62,7 @@
     <Compile Include="Infrastructure\QueryModelStoreWithDocumentDbQueryAndSqlProjectionSpecs.cs" />
     <Compile Include="Infrastructure\SqlServerProjectionMetadataRepositorySpecs.cs" />
     <Compile Include="Infrastructure\SqlServerEventsRepositorySpecs.cs" />
+    <Compile Include="Infrastructure\InMemorySnapshotEventsRepositorySpecs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
