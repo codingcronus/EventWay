@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using Dapper;
 using EventWay.Core;
 
@@ -10,6 +13,9 @@ namespace EventWay.Infrastructure.MsSql
     public class SqlServerEventRepository : IEventRepository
     {
         const int CommandTimeout = 600;
+        private const string SchemaName = "dbo";
+        private const string TableName = "Events";
+        private static string Table => $"{SchemaName}.{TableName}";
 
         private readonly string _connectionString;
 
@@ -20,10 +26,10 @@ namespace EventWay.Infrastructure.MsSql
 
         public List<OrderedEventPayload> GetEvents<TAggregate>(long from) where TAggregate : Aggregate
         {
-            using (var conn = new SqlConnection(_connectionString))
+            using (var conn = new SqlConnection(_connectionString).AsOpen())
             {
                 var aggregateType = typeof(TAggregate).Name;
-                const string sql = "SELECT * FROM Events WHERE AggregateType = @aggregateType AND Ordering > @from";
+                var sql = $"SELECT * FROM {Table} WHERE AggregateType = @aggregateType AND Ordering > @from";
 
                 var listOfEventData = conn.Query<Event>(sql, new { aggregateType, from }, commandTimeout: CommandTimeout);
 
@@ -58,9 +64,9 @@ namespace EventWay.Infrastructure.MsSql
 
         public List<OrderedEventPayload> GetEventsByAggregateId(long from, Guid aggregateId)
         {
-            using (var conn = new SqlConnection(_connectionString))
+            using (var conn = new SqlConnection(_connectionString).AsOpen())
             {
-                const string sql = "SELECT * FROM Events WHERE AggregateId=@aggregateId AND Version > @from";
+                var sql = $"SELECT * FROM {Table} WHERE AggregateId=@aggregateId AND Version > @from";
 
                 var listOfEventData = conn.Query<Event>(sql, new { aggregateId, from }, commandTimeout: CommandTimeout);
 
@@ -79,9 +85,9 @@ namespace EventWay.Infrastructure.MsSql
 
         public List<OrderedEventPayload> GetEventsByType(long from, Type eventType)
         {
-            using (var conn = new SqlConnection(_connectionString))
+            using (var conn = new SqlConnection(_connectionString).AsOpen())
             {
-                const string sql = "SELECT * FROM Events WHERE EventType=@eventType AND Ordering > @from";
+                var sql = $"SELECT * FROM {Table} WHERE EventType=@eventType AND Ordering > @from";
 
                 var listOfEventData = conn.Query<Event>(sql, new { eventType.Name, from }, commandTimeout: CommandTimeout);
 
@@ -100,9 +106,9 @@ namespace EventWay.Infrastructure.MsSql
 
         public List<OrderedEventPayload> GetEventsByTypes(long from, Type[] eventTypes)
         {
-            using (var conn = new SqlConnection(_connectionString))
+            using (var conn = new SqlConnection(_connectionString).AsOpen())
             {
-                const string sql = "SELECT * FROM Events WHERE EventType IN(@eventType) AND Ordering > @from";
+                var sql = $"SELECT * FROM {Table} WHERE EventType IN(@eventType) AND Ordering > @from";
 
                 var formattedEventTypes = eventTypes
                     .Select(x => x.Name)
@@ -120,9 +126,9 @@ namespace EventWay.Infrastructure.MsSql
 
         public int? GetVersionByAggregateId(Guid aggregateId)
         {
-            using (var conn = new SqlConnection(_connectionString))
+            using (var conn = new SqlConnection(_connectionString).AsOpen())
             {
-                const string sql = "SELECT MAX(Version) FROM Events WHERE AggregateId=@aggregateId";
+                var sql = $"SELECT MAX(Version) FROM {Table} WHERE AggregateId=@aggregateId";
 
                 var version = (int?)conn.ExecuteScalar(sql, new { aggregateId }, commandTimeout: CommandTimeout);
 
@@ -130,56 +136,20 @@ namespace EventWay.Infrastructure.MsSql
             }
         }
 
-        public OrderedEventPayload[] SaveEvents(Event[] events)
+        public void ClearEvents()
         {
-            if (events.Any() == false)
-                return new OrderedEventPayload[] { }; // Nothing to save
-
-            using (var conn = new SqlConnection(_connectionString))
+            using (var conn = new SqlConnection(_connectionString).AsOpen())
             {
-                conn.Open();
-
-                using (var tx = conn.BeginTransaction())
-                {
-                    // Save events
-                    const string insertSql = @"INSERT INTO Events(EventId, Created, EventType, AggregateType, AggregateId, Version, Payload, Metadata) VALUES (@EventId, @Created, @EventType, @AggregateType, @AggregateId, @Version, @Payload, @Metadata)";
-                    conn.Execute(insertSql, events, tx, commandTimeout: CommandTimeout);
-
-                    // Get ordered events
-                    //const string selectSql = "SELECT * FROM Events WHERE EventId IN (@eventIds) ORDER BY Ordering";
-
-                    var selectQuery = "SELECT * FROM Events WHERE EventId IN (";
-                    for (int i = 0; i < events.Length; i++)
-                    {
-                        if (i > 0)
-                            selectQuery += ", ";
-                        selectQuery += "'" + events[i].EventId + "'";
-                    }
-                    selectQuery += ") ORDER BY Ordering";
-
-                    var listOfEventData = conn.Query<Event>(selectQuery, null, tx, commandTimeout: CommandTimeout);
-
-                    //var listOfEventData = conn.Query<Event>(selectSql, new { eventIds = events.Select(x => x.EventId).ToArray() }, tx);
-                    var insertedEvents = listOfEventData
-                        .Select(x => x.DeserializeOrderedEvent())
-                        .ToList();
-
-                    tx.Commit();
-
-                    return insertedEvents.ToArray();
-                }
+                var sql = $"TRUNCATE TABLE {Table}";
+                conn.Execute(sql, commandTimeout: CommandTimeout);
             }
         }
 
-        public void ClearEvents()
+        public OrderedEventPayload[] SaveEvents(Event[] events)
         {
-            using (var conn = new SqlConnection(_connectionString))
-            {
-                conn.Open();
-
-                const string sql = "TRUNCATE TABLE [Events]";
-                conn.Execute(sql, commandTimeout: CommandTimeout);
-            }
+            return events.Any()
+                ? new BulkCopyTools(_connectionString, TableName).BulkInsertEvents(events)
+                : new OrderedEventPayload[] { };
         }
     }
 }

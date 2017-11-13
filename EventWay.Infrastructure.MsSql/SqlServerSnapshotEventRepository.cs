@@ -72,18 +72,8 @@ namespace EventWay.Infrastructure.MsSql
             if (!snapshotEvents.Any())
                 return;
 
-            using (var conn = new SqlConnection(_connectionString))
-            {
-                conn.Open();
-
-                using (var tx = conn.BeginTransaction())
-                {
-                    // Save events
-                    const string insertSql = @"INSERT INTO SnapshotEvents(EventId, Created, EventType, AggregateType, AggregateId, Version, Payload, Metadata) VALUES (@EventId, @Created, @EventType, @AggregateType, @AggregateId, @Version, @Payload, @Metadata)";
-                    conn.Execute(insertSql, snapshotEvents, tx, commandTimeout: CommandTimeout);
-                    tx.Commit();
-                }
-            }
+            var bulk = new BulkCopyTools(_connectionString, "SnapshotEvents");
+            bulk.BulkInsertEvents(snapshotEvents);
         }
 
         public void ClearSnapshotEventsByAggregateId(Guid aggregateId, int to)
