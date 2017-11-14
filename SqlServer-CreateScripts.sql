@@ -14,7 +14,8 @@ CREATE TABLE [dbo].[Events](
 	[AggregateId] [uniqueidentifier] NOT NULL,
 	[Version] [int] NOT NULL,
 	[Payload] [nvarchar](max) NOT NULL,
-	[MetaData] [nvarchar](max) NULL
+	[MetaData] [nvarchar](max) NULL,
+	[Dispatched] [bit] NOT NULL,
 PRIMARY KEY CLUSTERED 
 (
 	[Ordering] ASC

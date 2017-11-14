@@ -33,6 +33,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Dapper, Version=1.50.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapper.1.50.2\lib\net451\Dapper.dll</HintPath>
+    </Reference>
+    <Reference Include="dotMemory.Unit, Version=109.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.dotMemoryUnit.2.4.20170830.172630\lib\dotMemory.Unit.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework, Version=3.8.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.3.8.1\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
@@ -47,6 +53,9 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite, Version=1.0.106.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Core.1.0.106.0\lib\net451\System.Data.SQLite.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -59,7 +68,9 @@
     <Compile Include="Core\SnapshotsSpecs.cs" />
     <Compile Include="Infrastructure\AggregateRepositoryWithSqlSpecs.cs" />
     <Compile Include="Infrastructure\DocumentDbQueryModelRepositorySpecs.cs" />
+    <Compile Include="Infrastructure\SqliteSnapshotEventsRepositorySpecs.cs" />
     <Compile Include="Infrastructure\QueryModelStoreWithDocumentDbQueryAndSqlProjectionSpecs.cs" />
+    <Compile Include="Infrastructure\SqliteEventsRepositorySpecs.cs" />
     <Compile Include="Infrastructure\SqlServerProjectionMetadataRepositorySpecs.cs" />
     <Compile Include="Infrastructure\SqlServerEventsRepositorySpecs.cs" />
     <Compile Include="Infrastructure\InMemorySnapshotEventsRepositorySpecs.cs" />
@@ -82,6 +93,10 @@
       <Project>{e65693a1-5be8-41c2-970e-4d9f48433b9a}</Project>
       <Name>EventWay.Infrastructure.MsSql</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EventWay.Infrastructure.Sqlite\EventWay.Infrastructure.Sqlite.csproj">
+      <Project>{2f4326aa-e60f-4d42-9aef-9dd41738a5de}</Project>
+      <Name>EventWay.Infrastructure.Sqlite</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EventWay.Infrastructure\EventWay.Infrastructure.csproj">
       <Project>{72BD6C9C-6C0C-421B-932A-003DA6F4F9F9}</Project>
       <Name>EventWay.Infrastructure</Name>
@@ -100,7 +115,9 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\NUnit3TestAdapter.3.8.0\build\net35\NUnit3TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit3TestAdapter.3.8.0\build\net35\NUnit3TestAdapter.props'))" />
+    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.106.0\build\net451\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.106.0\build\net451\System.Data.SQLite.Core.targets'))" />
   </Target>
+  <Import Project="..\packages\System.Data.SQLite.Core.1.0.106.0\build\net451\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.106.0\build\net451\System.Data.SQLite.Core.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

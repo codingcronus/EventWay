@@ -15,7 +15,7 @@ namespace EventWay.Infrastructure.MsSql
         const int CommandTimeout = 600;
         private const string SchemaName = "dbo";
         private const string TableName = "Events";
-        private static string Table => $"{SchemaName}.{TableName}";
+        private static string TableFullName => $"{SchemaName}.{TableName}";
 
         private readonly string _connectionString;
 
@@ -29,7 +29,7 @@ namespace EventWay.Infrastructure.MsSql
             using (var conn = new SqlConnection(_connectionString).AsOpen())
             {
                 var aggregateType = typeof(TAggregate).Name;
-                var sql = $"SELECT * FROM {Table} WHERE AggregateType = @aggregateType AND Ordering > @from";
+                var sql = $"SELECT * FROM {TableFullName} WHERE AggregateType = @aggregateType AND Ordering > @from";
 
                 var listOfEventData = conn.Query<Event>(sql, new { aggregateType, from }, commandTimeout: CommandTimeout);
 
@@ -66,7 +66,7 @@ namespace EventWay.Infrastructure.MsSql
         {
             using (var conn = new SqlConnection(_connectionString).AsOpen())
             {
-                var sql = $"SELECT * FROM {Table} WHERE AggregateId=@aggregateId AND Version > @from";
+                var sql = $"SELECT * FROM {TableFullName} WHERE AggregateId=@aggregateId AND Version > @from";
 
                 var listOfEventData = conn.Query<Event>(sql, new { aggregateId, from }, commandTimeout: CommandTimeout);
 
@@ -87,7 +87,7 @@ namespace EventWay.Infrastructure.MsSql
         {
             using (var conn = new SqlConnection(_connectionString).AsOpen())
             {
-                var sql = $"SELECT * FROM {Table} WHERE EventType=@eventType AND Ordering > @from";
+                var sql = $"SELECT * FROM {TableFullName} WHERE EventType=@eventType AND Ordering > @from";
 
                 var listOfEventData = conn.Query<Event>(sql, new { eventType.Name, from }, commandTimeout: CommandTimeout);
 
@@ -108,7 +108,7 @@ namespace EventWay.Infrastructure.MsSql
         {
             using (var conn = new SqlConnection(_connectionString).AsOpen())
             {
-                var sql = $"SELECT * FROM {Table} WHERE EventType IN(@eventType) AND Ordering > @from";
+                var sql = $"SELECT * FROM {TableFullName} WHERE EventType IN(@eventType) AND Ordering > @from";
 
                 var formattedEventTypes = eventTypes
                     .Select(x => x.Name)
@@ -128,7 +128,7 @@ namespace EventWay.Infrastructure.MsSql
         {
             using (var conn = new SqlConnection(_connectionString).AsOpen())
             {
-                var sql = $"SELECT MAX(Version) FROM {Table} WHERE AggregateId=@aggregateId";
+                var sql = $"SELECT MAX(Version) FROM {TableFullName} WHERE AggregateId=@aggregateId";
 
                 var version = (int?)conn.ExecuteScalar(sql, new { aggregateId }, commandTimeout: CommandTimeout);
 
@@ -140,7 +140,7 @@ namespace EventWay.Infrastructure.MsSql
         {
             using (var conn = new SqlConnection(_connectionString).AsOpen())
             {
-                var sql = $"TRUNCATE TABLE {Table}";
+                var sql = $"TRUNCATE TABLE {TableFullName}";
                 conn.Execute(sql, commandTimeout: CommandTimeout);
             }
         }

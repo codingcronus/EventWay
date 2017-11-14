@@ -18,9 +18,11 @@ namespace EventWay.Infrastructure.MsSql
             _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
         }
 
+        private SqlConnection Connect() => new SqlConnection(_connectionString).AsOpen();
+
         public List<OrderedEventPayload> GetSnapshotEventsByAggregateId(Guid aggregateId)
         {
-            using (var conn = new SqlConnection(_connectionString))
+            using (var conn = Connect())
             {
                 const string sql = "SELECT * FROM SnapshotEvents WHERE AggregateId=@aggregateId";
 
@@ -36,7 +38,7 @@ namespace EventWay.Infrastructure.MsSql
 
         public object GetSnapshotEventByAggregateIdAndVersion(Guid aggregateId, int version)
         {
-            using (var conn = new SqlConnection(_connectionString))
+            using (var conn = Connect())
             {
                 const string sql = "SELECT * FROM SnapshotEvents WHERE AggregateId=@aggregateId And Version=@version";
 
@@ -52,7 +54,7 @@ namespace EventWay.Infrastructure.MsSql
 
         public int? GetVersionByAggregateId(Guid aggregateId)
         {
-            using (var conn = new SqlConnection(_connectionString))
+            using (var conn = Connect())
             {
                 const string sql = "SELECT MAX(Version) FROM SnapshotEvents WHERE AggregateId=@aggregateId";
 
@@ -78,10 +80,9 @@ namespace EventWay.Infrastructure.MsSql
 
         public void ClearSnapshotEventsByAggregateId(Guid aggregateId, int to)
         {
-            using (var conn = new SqlConnection(_connectionString))
+            using (var conn = Connect())
             {
-                conn.Open();
-                const string sql = "DELETE FROM SnapshotEvents WHERE AggregateId=@aggregateId And Version < @from";
+                const string sql = "DELETE FROM SnapshotEvents WHERE AggregateId=@aggregateId And Version < @to";
                 conn.Execute(sql, new {aggregateId, to}, commandTimeout: CommandTimeout);
             }
         }
@@ -93,9 +94,8 @@ namespace EventWay.Infrastructure.MsSql
 
         public void ClearSnapshotEvents()
         {
-            using (var conn = new SqlConnection(_connectionString))
+            using (var conn = Connect())
             {
-                conn.Open();
                 const string sql = "TRUNCATE TABLE SnapshotEvents";
                 conn.Execute(sql, commandTimeout: CommandTimeout);
             }
