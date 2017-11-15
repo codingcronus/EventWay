@@ -67,6 +67,7 @@
     <Compile Include="GuidAsCharHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqliteEventRepository.cs" />
+    <Compile Include="SqliteProjectionMetadataRepository.cs" />
     <Compile Include="SqliteSnapshotEventRepository.cs" />
   </ItemGroup>
   <ItemGroup>
