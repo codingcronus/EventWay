@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DocumentDbParallelHelper.cs" />
     <Compile Include="DocumentDbQueryModelRepository.cs" />
     <Compile Include="DocumentDbRetryHelper.cs" />
     <Compile Include="PartitionKeyGenerator.cs" />
