@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -147,9 +148,19 @@ namespace EventWay.Infrastructure.MsSql
 
         public OrderedEventPayload[] SaveEvents(Event[] events)
         {
-            return events.Any()
-                ? new BulkCopyTools(_connectionString, TableName).BulkInsertEvents(events)
-                : new OrderedEventPayload[] { };
+            try
+            {
+                return events.Any()
+                    ? new BulkCopyTools(_connectionString, TableName).BulkInsertEvents(events)
+                    : new OrderedEventPayload[] { };
+            }
+            catch (SqlException ex)
+            {
+                var method = MethodBase.GetCurrentMethod();
+                var type = method.DeclaringType?.Name;
+                Trace.TraceError($"{type}.{method.Name}: {ex}");
+                throw;
+            }
         }
     }
 }
