@@ -1,73 +1,96 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace EventWay.Query
 {
-    public class QueryModelStore
-    {
-        public QueryModelStore(
-            IQueryModelRepository queryModelRepository,
-            IProjectionMetadataRepository projectionMetadataRepository,
-            long eventOffset,
-            Guid projectionId)
-        {
-            if (queryModelRepository == null)
-                throw new ArgumentNullException(nameof(queryModelRepository));
-            if (projectionMetadataRepository == null)
-                throw new ArgumentNullException(nameof(projectionMetadataRepository));
+	public class QueryModelStore
+	{
+		public QueryModelStore(
+			IQueryModelRepository queryModelRepository,
+			IProjectionMetadataRepository projectionMetadataRepository,
+			long eventOffset,
+			Guid projectionId)
+		{
+			if (queryModelRepository == null)
+				throw new ArgumentNullException(nameof(queryModelRepository));
+			if (projectionMetadataRepository == null)
+				throw new ArgumentNullException(nameof(projectionMetadataRepository));
 
-            _queryModelRepository = queryModelRepository;
-            _projectionMetadataRepository = projectionMetadataRepository;
+			_queryModelRepository = queryModelRepository;
+			_projectionMetadataRepository = projectionMetadataRepository;
 
-            _eventOffset = eventOffset;
-            _projectionId = projectionId;
-        }
+			_eventOffset = eventOffset;
+			_projectionId = projectionId;
+		}
 
-        private readonly IQueryModelRepository _queryModelRepository;
-        private readonly IProjectionMetadataRepository _projectionMetadataRepository;
-        private long _eventOffset;
-        private readonly Guid _projectionId;
+		private readonly IQueryModelRepository _queryModelRepository;
+		private readonly IProjectionMetadataRepository _projectionMetadataRepository;
+		private long _eventOffset;
+		private readonly Guid _projectionId;
 
-        public void Initialize()
-        {
-            
-        }
+		public void Initialize()
+		{
 
-        public async Task<T> GetQueryModel<T>(Guid id, bool createIfMissing = false) where T : QueryModel
-        {
-            var model = await _queryModelRepository.GetById<T>(id);
+		}
 
-            if (model == null && createIfMissing)
-                return (T)Activator.CreateInstance(typeof(T), id);
+		public async Task<T> GetQueryModel<T>(Guid id, bool createIfMissing = false) where T : QueryModel
+		{
+			var model = await _queryModelRepository.GetById<T>(id);
 
-            return model;
-        }
+			if (model == null && createIfMissing)
+				return (T)Activator.CreateInstance(typeof(T), id);
 
-        public async Task SaveQueryModel<T>(T queryModel) where T : QueryModel
-        {
-            //TODO: Wrap in transaction and _eventOffset-- on error
+			return model;
+		}
 
-            await _queryModelRepository.Save(queryModel);
+		public async Task<List<T>> GetQueryModels<T>(List<Guid> ids) where T : QueryModel
+		{
+			var models = await _queryModelRepository.GetByIds<T>(ids);
 
-            AcknowledgeEvent();
-        }
+			return models;
+		}
 
-        public async Task DeleteQueryModel<T>(T queryModel) where T : QueryModel
-        {
-            await _queryModelRepository.DeleteById<T>(queryModel.id);
+		public async Task SaveQueryModel<T>(T queryModel) where T : QueryModel
+		{
+			//TODO: Wrap in transaction and _eventOffset-- on error
 
-            AcknowledgeEvent();
-        }
+			await _queryModelRepository.Save(queryModel);
 
-        public void AcknowledgeEvent()
-        {
-            _eventOffset++;
+			AcknowledgeEvent();
+		}
 
-            var projectionMeta = new ProjectionMetadata(
-                _projectionId,
-                _eventOffset);
+		public async Task SaveQueryModels<T>(List<T> queryModels) where T : QueryModel
+		{
+			
+			await _queryModelRepository.SaveQueryModelList(queryModels);
 
-            _projectionMetadataRepository.UpdateEventOffset(projectionMeta);
-        }
-    }
+			AcknowledgeEvent();
+		}
+
+		public async Task DeleteQueryModelList<T>(List<Guid> ids) where T : QueryModel
+		{
+			await _queryModelRepository.DeleteMultipleModel<T>(ids);
+
+			AcknowledgeEvent();
+		}
+
+		public async Task DeleteQueryModel<T>(T queryModel) where T : QueryModel
+		{
+			await _queryModelRepository.DeleteById<T>(queryModel.id);
+
+			AcknowledgeEvent();
+		}
+
+		public void AcknowledgeEvent()
+		{
+			_eventOffset++;
+
+			var projectionMeta = new ProjectionMetadata(
+				_projectionId,
+				_eventOffset);
+
+			_projectionMetadataRepository.UpdateEventOffset(projectionMeta);
+		}
+	}
 }
