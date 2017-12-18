@@ -10,7 +10,6 @@ namespace EventWay.Query
         }
 
         public Guid id { get; set; }
-        public string partitionKey { get; set; }
         public string Type => GetType().Name;
         public abstract string BaseType { get; }
     }

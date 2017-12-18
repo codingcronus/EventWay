@@ -12,12 +12,11 @@ namespace EventWay.Infrastructure.CosmosDb
 {
 	public class DocumentDbQueryModelRepository : IQueryModelRepository
 	{
-		private const string PartitionKeyPath = "/partitionKey";
+		private const string PartitionKeyPath = "/id";
 
 		private readonly string _databaseId;
 		private readonly string _collectionId;
 		private readonly int _offerThroughput;
-		private readonly int _noOfPartitions;
 		private readonly string _endpoint;
 		private readonly string _authKey;
 		private DocumentClient _client;
@@ -27,7 +26,6 @@ namespace EventWay.Infrastructure.CosmosDb
 			_databaseId = database;
 			_collectionId = collection;
 			_offerThroughput = offerThroughput;
-			_noOfPartitions = noOfPartitions;
 			_endpoint = endpoint;
 			_authKey = authKey;
 
@@ -49,7 +47,6 @@ namespace EventWay.Infrastructure.CosmosDb
 
 		public async Task Save(QueryModel queryModel)
 		{
-			queryModel.partitionKey = PartitionKeyGenerator.Generate(queryModel.id, _noOfPartitions);
 			await DocumentDbRetryPolicy.ExecuteWithRetries(
 				() => _client.UpsertDocumentAsync(GetCollectionUri(), queryModel, null, disableAutomaticIdGeneration: true)
 				);
@@ -146,11 +143,9 @@ namespace EventWay.Infrastructure.CosmosDb
 
 		private RequestOptions CreateRequestOptions(Guid id)
 		{
-			var key = PartitionKeyGenerator.Generate(id, _noOfPartitions);
-
 			var options = new RequestOptions()
 			{
-				PartitionKey = new PartitionKey(key)
+				PartitionKey = new PartitionKey(id.ToString())
 			};
 
 			return options;
@@ -217,9 +212,9 @@ namespace EventWay.Infrastructure.CosmosDb
 			}
 
 			var results = await query.AsDocumentQuery().ExecuteNextAsync<T>();
-
-			var count = await QueryCountAsyncInternal<T>();
-
+            //Should not use count in this way, currently Cosmos does not support count using group by, it will make query very slow when db was large
+            //var count = await QueryCountAsyncInternal<T>();
+            var count = 0;
 			return new PagedResult<T>(results.ToList().AsReadOnly(), count, results.ResponseContinuation);
 		}
 
@@ -261,12 +256,12 @@ namespace EventWay.Infrastructure.CosmosDb
 			return null;
 		}
 
-		private FeedOptions CreateFeedOptions(int maxItemCount)
+		private FeedOptions CreateFeedOptions(int maxItemCount, bool enableCrossPartitionQuery = true)
 		{
 			return new FeedOptions
 			{
 				MaxItemCount = maxItemCount,
-				EnableCrossPartitionQuery = true,
+				EnableCrossPartitionQuery = enableCrossPartitionQuery,
 				MaxDegreeOfParallelism = -1,
 				MaxBufferedItemCount = -1
 			};
