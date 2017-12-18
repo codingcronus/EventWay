@@ -212,9 +212,9 @@ namespace EventWay.Infrastructure.CosmosDb
 			}
 
 			var results = await query.AsDocumentQuery().ExecuteNextAsync<T>();
-
-			var count = await QueryCountAsyncInternal<T>();
-
+            //Should not use count in this way, currently Cosmos does not support count using group by, it will make query very slow when db was large
+            //var count = await QueryCountAsyncInternal<T>();
+            var count = 0;
 			return new PagedResult<T>(results.ToList().AsReadOnly(), count, results.ResponseContinuation);
 		}
 
