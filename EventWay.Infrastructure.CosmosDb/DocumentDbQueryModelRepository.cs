@@ -13,8 +13,9 @@ namespace EventWay.Infrastructure.CosmosDb
 	public class DocumentDbQueryModelRepository : IQueryModelRepository
 	{
 		private const string PartitionKeyPath = "/id";
-
-		private readonly string _databaseId;
+        private static Uri _collectionUri;
+        private object lockUri = new object();
+        private readonly string _databaseId;
 		private readonly string _collectionId;
 		private readonly int _offerThroughput;
 		private readonly string _endpoint;
@@ -410,7 +411,25 @@ namespace EventWay.Infrastructure.CosmosDb
 
 		private Uri GetCollectionUri()
 		{
-			return UriFactory.CreateDocumentCollectionUri(_databaseId, _collectionId);
+            if (_collectionUri != null)
+            {
+                return _collectionUri;
+            }
+            else
+            {
+                lock (lockUri)
+                {
+                    if (_collectionUri != null)
+                    {
+                        return _collectionUri;
+                    }
+                    else
+                    {
+                        _collectionUri = UriFactory.CreateDocumentCollectionUri(_databaseId, _collectionId);
+                        return _collectionUri;
+                    }
+                }
+            }
 		}
 	}
 }
