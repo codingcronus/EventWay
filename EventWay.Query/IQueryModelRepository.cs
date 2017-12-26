@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -17,8 +18,9 @@ namespace EventWay.Query
 
 		Task<PagedResult<T>> GetPagedListAsync<T>(PagedQuery pagedQuery) where T : QueryModel;
 		Task<PagedResult<T>> GetPagedListAsync<T>(PagedQuery pagedQuery, Expression<Func<T, bool>> predicate) where T : QueryModel;
+        IQueryable<T> CreatePagedListQuery<T>(PagedQuery pagedQuery, Expression<Func<T, bool>> predicate) where T : QueryModel;
 
-		Task<int> QueryCountAsync<T>() where T : QueryModel;
+        Task<int> QueryCountAsync<T>() where T : QueryModel;
 
 		Task<T> QueryItemAsync<T>(Expression<Func<T, bool>> predicate) where T : QueryModel;
 

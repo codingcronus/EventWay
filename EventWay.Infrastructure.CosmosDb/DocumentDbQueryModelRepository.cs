@@ -199,27 +199,34 @@ namespace EventWay.Infrastructure.CosmosDb
 
 		private async Task<PagedResult<T>> GetPagedListAsyncInternal<T>(PagedQuery pagedQuery, Expression<Func<T, bool>> predicate) where T : QueryModel
 		{
-			var options = CreateFeedOptions(pagedQuery.MaxItemCount);
-			if (!string.IsNullOrEmpty(pagedQuery.ContinuationToken))
-			{
-				options.RequestContinuation = pagedQuery.ContinuationToken;
-			}
+            var query = CreatePagedListQuery(pagedQuery, predicate);
 
-			var query = _client.CreateDocumentQuery<T>(GetCollectionUri(), options)
-				.Where(x => x.Type == typeof(T).Name);
-			if (predicate != null)
-			{
-				query = query.Where(predicate);
-			}
-
-			var results = await query.AsDocumentQuery().ExecuteNextAsync<T>();
+            var results = await query.AsDocumentQuery().ExecuteNextAsync<T>();
             //Should not use count in this way, currently Cosmos does not support count using group by, it will make query very slow when db was large
             //var count = await QueryCountAsyncInternal<T>();
             var count = 0;
 			return new PagedResult<T>(results.ToList().AsReadOnly(), count, results.ResponseContinuation);
 		}
 
-		public async Task<int> QueryCountAsync<T>() where T : QueryModel
+        public IQueryable<T> CreatePagedListQuery<T>(PagedQuery pagedQuery, Expression<Func<T, bool>> predicate) where T : QueryModel
+        {
+            var options = CreateFeedOptions(pagedQuery.MaxItemCount);
+            if (!string.IsNullOrEmpty(pagedQuery.ContinuationToken))
+            {
+                options.RequestContinuation = pagedQuery.ContinuationToken;
+            }
+
+            var query = _client.CreateDocumentQuery<T>(GetCollectionUri(), options)
+                .Where(x => x.Type == typeof(T).Name);
+            if (predicate != null)
+            {
+                query = query.Where(predicate);
+            }
+
+            return query;
+        }
+
+        public async Task<int> QueryCountAsync<T>() where T : QueryModel
 		{
 			return await DocumentDbRetryPolicy.ExecuteWithRetries(
 			  () => QueryCountAsyncInternal<T>()
