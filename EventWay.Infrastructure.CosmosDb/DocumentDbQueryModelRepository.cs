@@ -18,16 +18,20 @@ namespace EventWay.Infrastructure.CosmosDb
         private readonly string _databaseId;
 		private readonly string _collectionId;
 		private readonly int _offerThroughput;
-		private readonly string _endpoint;
+        private readonly int _noOfParallelTasks;
+
+        private readonly string _endpoint;
 		private readonly string _authKey;
 		private DocumentClient _client;
 
-		public DocumentDbQueryModelRepository(string database, string collection, int offerThroughput, int noOfPartitions, string endpoint, string authKey)
+		public DocumentDbQueryModelRepository(string database, string collection, int offerThroughput, int noOfParallelTasks, string endpoint, string authKey)
 		{
 			_databaseId = database;
 			_collectionId = collection;
 			_offerThroughput = offerThroughput;
-			_endpoint = endpoint;
+            _noOfParallelTasks = noOfParallelTasks;
+
+            _endpoint = endpoint;
 			_authKey = authKey;
 
 			CreateClient();
@@ -60,7 +64,7 @@ namespace EventWay.Infrastructure.CosmosDb
 			{
 				tasks.Add(Save(docModel));
 			}
-			await DocumentDbParallelHelper.RunParallel(_offerThroughput, tasks);
+			await DocumentDbParallelHelper.RunParallel(_noOfParallelTasks, tasks);
 		}
 
 		public async Task DeleteById<T>(Guid id) where T : QueryModel
@@ -79,7 +83,7 @@ namespace EventWay.Infrastructure.CosmosDb
 			{
 				tasks.Add(DeleteById<T>(id));
 			}
-			await DocumentDbParallelHelper.RunParallel(_offerThroughput, tasks);
+			await DocumentDbParallelHelper.RunParallel(_noOfParallelTasks, tasks);
 		}
 
 		public async Task<T> GetById<T>(Guid id) where T : QueryModel

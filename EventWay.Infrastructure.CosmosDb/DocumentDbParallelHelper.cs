@@ -6,11 +6,11 @@ namespace EventWay.Infrastructure.CosmosDb
 {
 	public class DocumentDbParallelHelper
 	{
-		public static async Task RunParallel(int offerThroughput, List<Task> actions)
+		public static async Task RunParallel(int taskCount, List<Task> actions)
 		{
-			var taskCount = 0;
-			taskCount = Math.Max(offerThroughput / 1000, 1);
-			taskCount = Math.Min(taskCount, 50);
+			//var taskCount = 0;
+			//taskCount = Math.Max(noOfParallelTasks, 1);
+			//taskCount = Math.Min(taskCount, 50);
 			var tasks = new List<Task>();
 			foreach (var action in actions)
 			{
