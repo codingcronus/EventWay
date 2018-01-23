@@ -34,7 +34,7 @@ namespace EventWay.Infrastructure.MsSql
             if (events.Any() == false)
                 return new OrderedEventPayload[] { }; // Nothing to save
 
-            var tempTableName = $"##{TableName}";
+            var tempTableName = $"#{TableName}";
 
             using (var conn = new SqlConnection(_connectionString).AsOpen())
             using (var transaction = conn.BeginTransaction())

@@ -70,7 +70,7 @@ namespace EventWay.Test.Infrastructure
             var pagedResult = await repository.GetPagedListAsync<TestQueryModel>(pagedQuery);
 
             // ASSERT
-            Assert.IsTrue(pagedResult.Data.Count() >= 0 && pagedResult.Data.Count() <= pagedResult.Count);
+            Assert.IsTrue(pagedResult.Data.Count() >= 0);
         }
 
         [Test]

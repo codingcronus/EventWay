@@ -18,16 +18,20 @@ namespace EventWay.Infrastructure.CosmosDb
         private readonly string _databaseId;
 		private readonly string _collectionId;
 		private readonly int _offerThroughput;
-		private readonly string _endpoint;
+        private readonly int _noOfParallelTasks;
+
+        private readonly string _endpoint;
 		private readonly string _authKey;
 		private DocumentClient _client;
 
-		public DocumentDbQueryModelRepository(string database, string collection, int offerThroughput, int noOfPartitions, string endpoint, string authKey)
+		public DocumentDbQueryModelRepository(string database, string collection, int offerThroughput, int noOfParallelTasks, string endpoint, string authKey)
 		{
 			_databaseId = database;
 			_collectionId = collection;
 			_offerThroughput = offerThroughput;
-			_endpoint = endpoint;
+            _noOfParallelTasks = noOfParallelTasks;
+
+            _endpoint = endpoint;
 			_authKey = authKey;
 
 			CreateClient();
@@ -60,7 +64,7 @@ namespace EventWay.Infrastructure.CosmosDb
 			{
 				tasks.Add(Save(docModel));
 			}
-			await DocumentDbParallelHelper.RunParallel(_offerThroughput, tasks);
+			await DocumentDbParallelHelper.RunParallel(_noOfParallelTasks, tasks);
 		}
 
 		public async Task DeleteById<T>(Guid id) where T : QueryModel
@@ -79,7 +83,7 @@ namespace EventWay.Infrastructure.CosmosDb
 			{
 				tasks.Add(DeleteById<T>(id));
 			}
-			await DocumentDbParallelHelper.RunParallel(_offerThroughput, tasks);
+			await DocumentDbParallelHelper.RunParallel(_noOfParallelTasks, tasks);
 		}
 
 		public async Task<T> GetById<T>(Guid id) where T : QueryModel
@@ -199,27 +203,34 @@ namespace EventWay.Infrastructure.CosmosDb
 
 		private async Task<PagedResult<T>> GetPagedListAsyncInternal<T>(PagedQuery pagedQuery, Expression<Func<T, bool>> predicate) where T : QueryModel
 		{
-			var options = CreateFeedOptions(pagedQuery.MaxItemCount);
-			if (!string.IsNullOrEmpty(pagedQuery.ContinuationToken))
-			{
-				options.RequestContinuation = pagedQuery.ContinuationToken;
-			}
+            var query = CreatePagedListQuery(pagedQuery, predicate);
 
-			var query = _client.CreateDocumentQuery<T>(GetCollectionUri(), options)
-				.Where(x => x.Type == typeof(T).Name);
-			if (predicate != null)
-			{
-				query = query.Where(predicate);
-			}
-
-			var results = await query.AsDocumentQuery().ExecuteNextAsync<T>();
+            var results = await query.AsDocumentQuery().ExecuteNextAsync<T>();
             //Should not use count in this way, currently Cosmos does not support count using group by, it will make query very slow when db was large
             //var count = await QueryCountAsyncInternal<T>();
             var count = 0;
 			return new PagedResult<T>(results.ToList().AsReadOnly(), count, results.ResponseContinuation);
 		}
 
-		public async Task<int> QueryCountAsync<T>() where T : QueryModel
+        public IQueryable<T> CreatePagedListQuery<T>(PagedQuery pagedQuery, Expression<Func<T, bool>> predicate) where T : QueryModel
+        {
+            var options = CreateFeedOptions(pagedQuery.MaxItemCount);
+            if (!string.IsNullOrEmpty(pagedQuery.ContinuationToken))
+            {
+                options.RequestContinuation = pagedQuery.ContinuationToken;
+            }
+
+            var query = _client.CreateDocumentQuery<T>(GetCollectionUri(), options)
+                .Where(x => x.Type == typeof(T).Name);
+            if (predicate != null)
+            {
+                query = query.Where(predicate);
+            }
+
+            return query;
+        }
+
+        public async Task<int> QueryCountAsync<T>() where T : QueryModel
 		{
 			return await DocumentDbRetryPolicy.ExecuteWithRetries(
 			  () => QueryCountAsyncInternal<T>()
