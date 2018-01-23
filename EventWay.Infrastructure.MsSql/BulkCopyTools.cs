@@ -60,7 +60,7 @@ namespace EventWay.Infrastructure.MsSql
                 // As the table has an integer identity column, we can now select the 
                 // top N rows ordered by "indentity" (Ordering) descending to get the 
                 // just inserted events. Where N is the number of events written.
-                var sql = $"SELECT TOP {events.Length} * FROM {_tableNameWithSchema} ORDER BY Ordering DESC";
+                var sql = $"SELECT TOP {events.Length} * FROM {_tableNameWithSchema} with(NOLOCK) ORDER BY Ordering DESC";
                 var listOfEventData = conn.Query<Event>(sql, transaction: transaction,
                     commandTimeout: CommandTimeout);
 
