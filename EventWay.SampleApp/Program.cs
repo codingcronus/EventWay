@@ -70,7 +70,7 @@ namespace EventWay.SampleApp
             var projectionMetadataRepository = new SqlServerProjectionMetadataRepository(projectionMetadataDatabaseConnectionString);
 
             // Query Model Repository
-            var queryModelRepository = new DocumentDbQueryModelRepository(cosmosDbDatabaseId, cosmosDbCollectionId,
+            var queryModelRepository = new CosmosDbQueryModelRepository(cosmosDbDatabaseId, cosmosDbCollectionId,
                 offerThroughput, noOfPartitions, cosmosDbEndpoint, cosmosDbAuthKey);
             queryModelRepository.Initialize();
 

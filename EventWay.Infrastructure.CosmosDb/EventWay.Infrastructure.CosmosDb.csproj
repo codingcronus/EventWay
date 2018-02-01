@@ -54,8 +54,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CosmosDbQueryModelRepository.cs" />
     <Compile Include="DocumentDbParallelHelper.cs" />
-    <Compile Include="DocumentDbQueryModelRepository.cs" />
     <Compile Include="DocumentDbRetryHelper.cs" />
     <Compile Include="PartitionKeyGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -30,7 +30,7 @@ namespace EventWay.SampleApp.Application.Projections
 
         public async Task<UserQueryModel[]> QueryAll()
         {
-            return (await QueryModelRepository.GetAll<UserQueryModel>(x => true)).ToArray();
+            return (await QueryModelRepository.GetAll<UserQueryModel>()).ToArray();
         }
 
         public override void Listen()

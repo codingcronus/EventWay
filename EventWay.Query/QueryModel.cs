@@ -4,13 +4,16 @@ namespace EventWay.Query
 {
     public abstract class QueryModel
     {
-        protected QueryModel(Guid id)
+        protected QueryModel(Guid aggregateId)
         {
-            this.id = id;
+            id = Guid.NewGuid();
+
+            AggregateId = aggregateId;
         }
 
         public Guid id { get; set; }
+
+        public Guid AggregateId { get; set; }
         public string Type => GetType().Name;
-        public abstract string BaseType { get; }
     }
 }

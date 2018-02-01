@@ -31,24 +31,16 @@ namespace EventWay.Query
 
 		public void Initialize()
 		{
-
 		}
 
-		public async Task<T> GetQueryModel<T>(Guid id, bool createIfMissing = false) where T : QueryModel
+		public async Task<T> GetQueryModel<T>(Guid aggregateId, bool createIfMissing = false) where T : QueryModel
 		{
-			var model = await _queryModelRepository.GetById<T>(id);
+			var model = await _queryModelRepository.GetById<T>(aggregateId);
 
 			if (model == null && createIfMissing)
-				return (T)Activator.CreateInstance(typeof(T), id);
+				return (T)Activator.CreateInstance(typeof(T), aggregateId);
 
 			return model;
-		}
-
-		public async Task<List<T>> GetQueryModels<T>(List<Guid> ids) where T : QueryModel
-		{
-			var models = await _queryModelRepository.GetByIds<T>(ids);
-
-			return models;
 		}
 
 		public async Task SaveQueryModel<T>(T queryModel) where T : QueryModel
@@ -60,29 +52,44 @@ namespace EventWay.Query
 			AcknowledgeEvent();
 		}
 
-		public async Task SaveQueryModels<T>(List<T> queryModels) where T : QueryModel
-		{
-			
-			await _queryModelRepository.SaveQueryModelList(queryModels);
+        public async Task DeleteQueryModel<T>(T queryModel) where T : QueryModel
+        {
+            await _queryModelRepository.DeleteById<T>(queryModel.AggregateId);
 
-			AcknowledgeEvent();
+            AcknowledgeEvent();
+        }
+
+        /*
+        public async Task<List<T>> GetQueryModels<T>(List<Guid> aggregateIds) where T : QueryModel
+		{
+			var models = await _queryModelRepository.GetByIds<T>(aggregateIds);
+
+			return models;
 		}
 
-		public async Task DeleteQueryModelList<T>(List<Guid> ids) where T : QueryModel
+		public async Task SaveQueryModels<T>(List<T> queryModels) where T : QueryModel
 		{
-			await _queryModelRepository.DeleteMultipleModel<T>(ids);
+			await _queryModelRepository.SaveMany(queryModels);
 
 			AcknowledgeEvent();
 		}
 
 		public async Task DeleteQueryModel<T>(T queryModel) where T : QueryModel
 		{
-			await _queryModelRepository.DeleteById<T>(queryModel.id);
+			await _queryModelRepository.DeleteById<T>(queryModel.AggregateId);
 
 			AcknowledgeEvent();
 		}
 
-		public void AcknowledgeEvent()
+        public async Task DeleteQueryModels<T>(List<Guid> aggregateIds) where T : QueryModel
+        {
+            await _queryModelRepository.DeleteManyById<T>(aggregateIds);
+
+            AcknowledgeEvent();
+        }
+        */
+
+        public void AcknowledgeEvent()
 		{
 			_eventOffset++;
 
