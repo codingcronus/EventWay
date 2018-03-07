@@ -128,14 +128,12 @@ namespace EventWay.Infrastructure.CosmosDb
 								 where ids.Contains(d.id)
 								 select new { d.id, d }).ToList();
 
-				if (documents.Count == 0)
-				{
-					foreach (var id in ids)
-					{
-						result.Add((T)Activator.CreateInstance(typeof(T), id));
-					}
-				}
-				return Task.FromResult(result);
+			    if (documents.Count <= 0) return Task.FromResult(result);
+			    foreach (var document in documents)
+			    {
+			        result.Add(document.d);
+			    }
+			    return Task.FromResult(result);
 			}
 			catch (DocumentClientException e)
 			{
