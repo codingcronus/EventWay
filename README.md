@@ -5,6 +5,17 @@ Event Sourcing and CQRS (Command Query Responsibility Segregation) works really 
 
 ![alt text](https://github.com/tigerdyret/EventWay/raw/master/es-cqrs.png "Event Sourcing + CQRS")
 
+## Quick guide for running the Sample app
+1. Clone the repository
+2. Open the EventWay.sln solution
+3. Create a MSSQL database
+   1. Run the creation script *EventWay.Infrastructure.MsSql/CreateDb.sql*
+4. Create an Azure CosmosDB or run the Azure CosmosDB Emulator 
+5. Open 'EventWay.SampleApp/Program.cs'
+   1. Update *eventDatabaseConnectionString* with the MSSQL database connection
+   2. Update *cosmosDbAuthKey* with the CosmosDB database connection
+6. Run the application
+   
 ## How to setup
 1. Create a new Console App (.NET Framework) project
 2. Right-click the project and select Manage NuGet Packages
