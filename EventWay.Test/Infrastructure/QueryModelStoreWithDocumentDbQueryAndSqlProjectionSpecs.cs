@@ -30,7 +30,7 @@ namespace EventWay.Test.Infrastructure
             var projectionType = "IntegrationTestProjection";
 
             // Query Model Repository (DocumentDB)
-            var queryModelRepository = new DocumentDbQueryModelRepository(_database, _collection, _offerThroughput, _noOfPartitions, _endpoint, _authKey);
+            var queryModelRepository = new CosmosDbQueryModelRepository(_database, _collection, _offerThroughput, _noOfPartitions, _endpoint, _authKey);
             queryModelRepository.Initialize();
 
             // Projection Metadata Repository (MSSQL);

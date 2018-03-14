@@ -27,7 +27,7 @@ namespace EventWay.SampleApp.Application
         public async Task<Guid> RegisterUser(Commands.RegisterUser command)
         {
             // Check if user already exists
-            var existingUser = await _queryModelRepository.QueryItemAsync<UserQueryModel>(x => x.DisplayName == $"{command.FirstName} {command.LastName}");
+            var existingUser = await _queryModelRepository.QueryItem<UserQueryModel>(x => x.DisplayName == $"{command.FirstName} {command.LastName}");
             if (existingUser != null)
                 return existingUser.id;
 
