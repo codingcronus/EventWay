@@ -6,7 +6,7 @@ using EventWay.Infrastructure.CosmosDb;
 using EventWay.Query;
 using NUnit.Framework;
 using System.Collections.Generic;
-using Ploeh.AutoFixture;
+using AutoFixture;
 
 namespace EventWay.Test.Infrastructure
 {
