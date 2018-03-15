@@ -13,6 +13,6 @@ namespace EventWay.SampleApp.Application.QueryModels
         public string LastName { get; set; }
         public string DisplayName { get; set; }
 
-        public override string BaseType => string.Empty;
+        //public override string BaseType => string.Empty;
     }
 }
