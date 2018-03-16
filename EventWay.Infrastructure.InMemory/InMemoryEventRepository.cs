@@ -17,7 +17,10 @@ namespace EventWay.Infrastructure.InMemory
 
         public List<OrderedEventPayload> GetEvents<TAggregate>(long @from) where TAggregate : Aggregate
         {
+            var aggregateType = typeof(TAggregate).Name;
+
             return _inMemoryStorage
+                .Where(x => x.Value.AggregateType.Equals(aggregateType, StringComparison.InvariantCultureIgnoreCase))
                 .Where(x => x.Key > from)
                 .Select(x => x.Value.DeserializeOrderedEvent())
                 .ToList();

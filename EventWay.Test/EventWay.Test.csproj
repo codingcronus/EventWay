@@ -87,6 +87,10 @@
       <Project>{E9944AB9-0D72-49EF-8D1A-21518A3F3CFB}</Project>
       <Name>EventWay.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EventWay.Infrastructure.ApplicationInsights\EventWay.Infrastructure.ApplicationInsights.csproj">
+      <Project>{96becf10-d1d7-4b80-b982-63ba620124b8}</Project>
+      <Name>EventWay.Infrastructure.ApplicationInsights</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EventWay.Infrastructure.CosmosDb\EventWay.Infrastructure.CosmosDb.csproj">
       <Project>{249fb03c-f3d8-4fbf-8270-98efb68bf6b2}</Project>
       <Name>EventWay.Infrastructure.CosmosDb</Name>
