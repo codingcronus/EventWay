@@ -46,7 +46,7 @@ namespace EventWay.Core
             eventPayloads.AddRange(events.Select(x => x.EventPayload));
 
             // Event spool aggregate.
-            aggregate = _aggregateFactory.Create<T>(
+            var aggregate = _aggregateFactory.Create<T>(
                 aggregateId,
                 eventPayloads.ToArray());
 

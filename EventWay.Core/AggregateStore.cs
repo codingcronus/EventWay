@@ -25,7 +25,6 @@ namespace EventWay.Core
 			_aggregateTracking = aggregateTracking;
 			_eventListener = eventListener;
 		    _aggregateCache = aggregateCache;
-
         }
 
         public T GetById<T>(Guid aggregateId) where T : IAggregate

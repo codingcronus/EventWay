@@ -91,6 +91,10 @@
       <Project>{249fb03c-f3d8-4fbf-8270-98efb68bf6b2}</Project>
       <Name>EventWay.Infrastructure.CosmosDb</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EventWay.Infrastructure.InMemory\EventWay.Infrastructure.InMemory.csproj">
+      <Project>{ba598541-be9f-412f-8356-0f53760d641c}</Project>
+      <Name>EventWay.Infrastructure.InMemory</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EventWay.Infrastructure.MsSql\EventWay.Infrastructure.MsSql.csproj">
       <Project>{e65693a1-5be8-41c2-970e-4d9f48433b9a}</Project>
       <Name>EventWay.Infrastructure.MsSql</Name>

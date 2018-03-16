@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using EventWay.Core;
 
-namespace EventWay.Infrastructure
+namespace EventWay.Infrastructure.InMemory
 {
     public class InMemorySnapshotEventRepository : ISnapshotEventRepository
     {

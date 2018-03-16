@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using EventWay.Core;
 using EventWay.Infrastructure;
+using EventWay.Infrastructure.InMemory;
 
 namespace EventWay.Test.Infrastructure
 {
