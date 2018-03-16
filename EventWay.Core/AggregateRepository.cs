@@ -9,26 +9,20 @@ namespace EventWay.Core
         private readonly IEventRepository _eventRepository;
         private readonly IAggregateFactory _aggregateFactory;
         private readonly ISnapshotEventRepository _snapshotEventRepository;
-        private readonly IAggregateCache _aggregateCache;
 
         public AggregateRepository(
             IEventRepository eventRepository,
             IAggregateFactory aggregateFactory,
-            ISnapshotEventRepository snapshotEventRepository = null,
-            IAggregateCache aggregateCache = null)
+            ISnapshotEventRepository snapshotEventRepository = null)
         {
             _eventRepository = eventRepository ?? throw new ArgumentNullException(nameof(eventRepository));
             _aggregateFactory = aggregateFactory ?? throw new ArgumentNullException(nameof(aggregateFactory));
 
             _snapshotEventRepository = snapshotEventRepository;
-            _aggregateCache = aggregateCache;
         }
 
         public T GetById<T>(Guid aggregateId) where T : IAggregate
         {
-            if (_aggregateCache.TryGet<T>(aggregateId, out var aggregate))
-                return aggregate;
-
             var loadFromVersion = 0L;
             var eventPayloads = new List<object>();
 

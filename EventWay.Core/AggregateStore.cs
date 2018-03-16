@@ -10,8 +10,13 @@ namespace EventWay.Core
 		private readonly IAggregateRepository _aggregateRepository;
 		private readonly IAggregateTracking _aggregateTracking;
 		private readonly IEventListener _eventListener;
+	    private readonly IAggregateCache _aggregateCache;
 
-		public AggregateStore(IAggregateRepository aggregateRepository, IEventListener eventListener, IAggregateTracking aggregateTracking = null)
+        public AggregateStore(
+		    IAggregateRepository aggregateRepository, 
+		    IEventListener eventListener, 
+		    IAggregateTracking aggregateTracking = null,
+		    IAggregateCache aggregateCache = null)
 		{
 			if (aggregateRepository == null) throw new ArgumentNullException(nameof(aggregateRepository));
 			if (eventListener == null) throw new ArgumentNullException(nameof(eventListener));
@@ -19,12 +24,16 @@ namespace EventWay.Core
 			_aggregateRepository = aggregateRepository;
 			_aggregateTracking = aggregateTracking;
 			_eventListener = eventListener;
-		}
+		    _aggregateCache = aggregateCache;
 
-		public T GetById<T>(Guid aggregateId) where T : IAggregate
-		{
-			return _aggregateRepository.GetById<T>(aggregateId);
-		}
+        }
+
+        public T GetById<T>(Guid aggregateId) where T : IAggregate
+        {
+            return _aggregateCache.TryGet<T>(aggregateId, out var aggregate) 
+                ? aggregate : 
+                _aggregateRepository.GetById<T>(aggregateId);
+        }
 
 		public async Task Save(IAggregate aggregate)
 		{
