@@ -8,6 +8,7 @@ namespace EventWay.Core
         bool Contains(Guid aggregateId);
         T Get<T>(Guid aggregateId) where T : IAggregate;
         bool TryGet<T>(Guid aggregateId, out T aggregate) where T : IAggregate;
-        void Clear(Guid aggregateId);
+        void Remove(Guid aggregateId);
+        void Clear();
     }
 }
