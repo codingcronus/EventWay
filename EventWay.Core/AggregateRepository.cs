@@ -9,23 +9,26 @@ namespace EventWay.Core
         private readonly IEventRepository _eventRepository;
         private readonly IAggregateFactory _aggregateFactory;
         private readonly ISnapshotEventRepository _snapshotEventRepository;
+        private readonly IAggregateCache _aggregateCache;
 
-        public AggregateRepository(IEventRepository eventRepository, IAggregateFactory aggregateFactory)
+        public AggregateRepository(
+            IEventRepository eventRepository,
+            IAggregateFactory aggregateFactory,
+            ISnapshotEventRepository snapshotEventRepository = null,
+            IAggregateCache aggregateCache = null)
         {
             _eventRepository = eventRepository ?? throw new ArgumentNullException(nameof(eventRepository));
             _aggregateFactory = aggregateFactory ?? throw new ArgumentNullException(nameof(aggregateFactory));
-        }
 
-        public AggregateRepository(IEventRepository eventRepository, IAggregateFactory aggregateFactory,
-            ISnapshotEventRepository snapshotEventRepository)
-            : this(eventRepository, aggregateFactory)
-        {
-            _snapshotEventRepository = snapshotEventRepository ??
-                                       throw new ArgumentNullException(nameof(snapshotEventRepository));
+            _snapshotEventRepository = snapshotEventRepository;
+            _aggregateCache = aggregateCache;
         }
 
         public T GetById<T>(Guid aggregateId) where T : IAggregate
         {
+            if (_aggregateCache.TryGet<T>(aggregateId, out var aggregate))
+                return aggregate;
+
             var loadFromVersion = 0L;
             var eventPayloads = new List<object>();
 
@@ -49,7 +52,7 @@ namespace EventWay.Core
             eventPayloads.AddRange(events.Select(x => x.EventPayload));
 
             // Event spool aggregate.
-            var aggregate = _aggregateFactory.Create<T>(
+            aggregate = _aggregateFactory.Create<T>(
                 aggregateId,
                 eventPayloads.ToArray());
 
@@ -62,7 +65,7 @@ namespace EventWay.Core
 
         public OrderedEventPayload[] Save(IAggregate aggregate)
         {
-            return Save(new[] {aggregate});
+            return Save(new[] { aggregate });
         }
 
         public OrderedEventPayload[] Save<T>(IEnumerable<T> aggregates) where T : IAggregate
@@ -71,10 +74,10 @@ namespace EventWay.Core
             var allSnapshotsToSave = new List<Event>();
             foreach (var aggregate in aggregates)
             {
-                List<Event> eventsToSave;
-                List<Event> snapshotsToSave;
-                int version;
-                ExtractEvents(aggregate, out eventsToSave, out snapshotsToSave, out version);
+                ExtractEvents(aggregate, 
+                    out var eventsToSave, 
+                    out var snapshotsToSave, 
+                    out var version);
                 var storedAggregateVersion = _eventRepository.GetVersionByAggregateId(aggregate.Id);
                 if (storedAggregateVersion.HasValue && storedAggregateVersion >= version)
                     throw new Exception($"Concurrency error for aggregate {aggregate.Id}");
@@ -88,7 +91,7 @@ namespace EventWay.Core
             return _eventRepository.SaveEvents(allEventsToSave.ToArray());
         }
 
-        private void ExtractEvents(IAggregate aggregate, out List<Event> eventsToSave, out List<Event> snapshotsToSave, out int version)
+        private static void ExtractEvents(IAggregate aggregate, out List<Event> eventsToSave, out List<Event> snapshotsToSave, out int version)
         {
             eventsToSave = new List<Event>();
             snapshotsToSave = new List<Event>();

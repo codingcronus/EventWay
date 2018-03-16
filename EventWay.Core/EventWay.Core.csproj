@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Aggregate.cs" />
+    <Compile Include="IAggregateCache.cs" />
     <Compile Include="IAggregateTracking.cs" />
     <Compile Include="AggregateRepository.cs" />
     <Compile Include="AggregateStore.cs" />
