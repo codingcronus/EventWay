@@ -8,6 +8,6 @@ namespace EventWay.Query
 
         ProjectionMetadata GetByProjectionId(Guid projectionId);
         void UpdateEventOffset(ProjectionMetadata projectionMetadata);
-        void InitializeProjection(Guid projectionId, string projectionType);
+        void InitializeProjection(Guid projectionId, string name);
     }
 }
