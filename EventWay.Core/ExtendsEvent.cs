@@ -15,7 +15,7 @@ namespace EventWay.Core
 
         public static OrderedEventPayload DeserializeOrderedEvent(this Event x)
         {
-            return new OrderedEventPayload(x.Ordering, x.DeserializeEvent());
+            return new OrderedEventPayload(x.Version, x.DeserializeEvent());
         }
 
         public static object DeserializeEvent(this Event x)
