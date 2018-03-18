@@ -29,9 +29,13 @@ namespace EventWay.Core
 
         public T GetById<T>(Guid aggregateId) where T : IAggregate
         {
-            return _aggregateCache.TryGet<T>(aggregateId, out var aggregate) 
-                ? aggregate : 
-                _aggregateRepository.GetById<T>(aggregateId);
+            if (_aggregateCache != null)
+            {
+                if (_aggregateCache.TryGet<T>(aggregateId, out var aggregate))
+                    return aggregate;
+            }
+
+            return _aggregateRepository.GetById<T>(aggregateId);
         }
 
 		public async Task Save(IAggregate aggregate)
@@ -52,9 +56,8 @@ namespace EventWay.Core
 		    var orderedEvents = _aggregateRepository.Save(enumeratedAggregates);
 
 			await _eventListener.Handle(orderedEvents);
-
-		    foreach (var aggregate in enumeratedAggregates)
-		        _aggregateCache.Set(aggregate);
+        
+		    _aggregateCache?.Set(enumeratedAggregates);
 		}
 	}
 }

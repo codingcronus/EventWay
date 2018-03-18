@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using EventWay.Core;
@@ -38,11 +39,17 @@ namespace EventWay.Infrastructure.Redis
                 => ConnectionMultiplexer.Connect(configuration, log));
         }
 
-        public void Set<T>(T aggregate) where T : IAggregate
+        public void Set(IAggregate aggregate)
         {
             Debug.WriteLine($"cache:redis:set:{aggregate.Id}");
             var value = JsonConvert.SerializeObject(aggregate, SerializerSettings);
             _cache.Value.StringSet(aggregate.Id.ToString(), value);
+        }
+
+        public void Set<T>(IEnumerable<T> aggregates) where T : IAggregate
+        {
+            foreach (var aggregate in aggregates)
+                Set(aggregate);
         }
 
         public bool Contains(Guid aggregateId) 

@@ -3,9 +3,9 @@ using EventWay.Infrastructure;
 using EventWay.Infrastructure.MsSql;
 using NUnit.Framework;
 using System;
-using EventWay.Infrastructure.InMemory;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using EventWay.Infrastructure.Redis;
-using StackExchange.Redis;
 using Aggregate = EventWay.Core.Aggregate;
 
 namespace EventWay.Test.Infrastructure
@@ -14,34 +14,38 @@ namespace EventWay.Test.Infrastructure
     public class AggregateRepositoryWithRedisSpecs
     {
         [Test]
-        public void ShouldSuccesfullyPersistAndHydrateEventsFromAggregate()
+        public async Task ShouldSuccesfullyPersistAndHydrateEventsFromAggregate()
         {
             // ARRANGE
             var testAggregate = new TestAggregate(Guid.NewGuid());
 
-            var eventRepository = new SqlServerEventRepository();
+            //var eventRepository = new SqlServerEventRepository("Server=tcp:shuffle.database.windows.net,1433;Initial Catalog=Shuffle;Persist Security Info=False;User ID=kvinther;Password=k1617v_KV;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Application Name=Shuffle;");
+            var eventRepository = new SqlServerEventRepository("Server=.\\sqlexpress;Initial Catalog=VerdunEvents;Persist Security Info=False;Trusted_Connection=True;MultipleActiveResultSets=False;Connection Timeout=30;Application Name=Shuffle;");
             var aggregateFactory = new DefaultAggregateFactory();
             var repository = new AggregateRepository(eventRepository, aggregateFactory);
             var listener = new BasicEventListener();
 
-            var cache = new RedisAggregateCache("localhost");
+            IAggregateCache cache = null;
+            //cache = new RedisAggregateCache("shuffle.redis.cache.windows.net:6380,password=z0cYd5K7aNjtE9tl8x6nxYa2lK5TwrJcB1aHsZGCx5Q=,ssl=True,abortConnect=False");
+            cache = new RedisAggregateCache("localhost");
             var store = new AggregateStore(repository, listener, aggregateCache: cache);
 
             // ACT
-            testAggregate.PublishTestEvent();
-            testAggregate.PublishTestEvent("How are you doing?");
+            var now = DateTime.Now;
+            for (var i = 1; i <= 50; i++)
+            {
+                testAggregate.PublishTestEvent($"{i}");
+                await store.Save(testAggregate);
+                var hydratedTestAggregate = store.GetById<TestAggregate>(testAggregate.Id);
+                // ASSERT
+                Assert.AreEqual(testAggregate.Id, hydratedTestAggregate.Id);
+                Assert.AreEqual(testAggregate.Version, hydratedTestAggregate.Version);
+                Assert.AreEqual(testAggregate.State, hydratedTestAggregate.State);
+            }
 
-            store.Save(testAggregate).GetAwaiter().GetResult();
 
-            var hydratedTestAggregate = store.GetById<TestAggregate>(testAggregate.Id);
-
-            
-
-            // ASSERT
-            Assert.AreEqual(testAggregate.Id, hydratedTestAggregate.Id);
-            Assert.AreEqual(testAggregate.Version, hydratedTestAggregate.Version);
-            Assert.AreEqual(testAggregate.State, hydratedTestAggregate.State);
-        }
+            Debug.WriteLine($"Total time: {(DateTime.Now - now):g}");
+         }
 
         public class TestEvent
         {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using EventWay.Core;
 
 namespace EventWay.Infrastructure.InMemory
@@ -8,7 +9,13 @@ namespace EventWay.Infrastructure.InMemory
     {
         private readonly ConcurrentDictionary<Guid, IAggregate> _cache = new ConcurrentDictionary<Guid, IAggregate>();
 
-        public void Set<T>(T aggregate) where T : IAggregate => _cache[aggregate.Id] = aggregate;
+        public void Set(IAggregate aggregate) => _cache[aggregate.Id] = aggregate;
+
+        public void Set<T>(IEnumerable<T> aggregates) where T : IAggregate
+        {
+            foreach (var aggregate in aggregates)
+                Set(aggregate);
+        }
 
         public bool Contains(Guid aggregateId) => _cache.ContainsKey(aggregateId);
 
