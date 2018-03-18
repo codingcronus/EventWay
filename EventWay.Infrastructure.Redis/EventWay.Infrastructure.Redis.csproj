@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="JsonNet.PrivateSettersContractResolvers\PrivateSettersContractResolvers.cs" />
     <Compile Include="RedisAggregateCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

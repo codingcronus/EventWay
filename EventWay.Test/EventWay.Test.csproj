@@ -52,12 +52,16 @@
     <Reference Include="Should, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Should.1.1.20\lib\Should.dll</HintPath>
     </Reference>
+    <Reference Include="StackExchange.Redis, Version=1.2.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\StackExchange.Redis.1.2.6\lib\net45\StackExchange.Redis.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.SQLite, Version=1.0.108.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Data.SQLite.Core.1.0.108.0\lib\net451\System.Data.SQLite.dll</HintPath>
     </Reference>
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -102,6 +106,10 @@
     <ProjectReference Include="..\EventWay.Infrastructure.MsSql\EventWay.Infrastructure.MsSql.csproj">
       <Project>{e65693a1-5be8-41c2-970e-4d9f48433b9a}</Project>
       <Name>EventWay.Infrastructure.MsSql</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EventWay.Infrastructure.Redis\EventWay.Infrastructure.Redis.csproj">
+      <Project>{e7d9bc5b-84b3-470c-a77a-b38c15ac0d0a}</Project>
+      <Name>EventWay.Infrastructure.Redis</Name>
     </ProjectReference>
     <ProjectReference Include="..\EventWay.Infrastructure.Sqlite\EventWay.Infrastructure.Sqlite.csproj">
       <Project>{2f4326aa-e60f-4d42-9aef-9dd41738a5de}</Project>

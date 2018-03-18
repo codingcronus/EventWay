@@ -43,7 +43,7 @@ namespace EventWay.Infrastructure.MsSql
                 // Create a temp table to bulk insert into.
                 CreateTempTable(conn, transaction, tempTableName);
 
-                // Prepare bulk data from evetsn.
+                // Prepare bulk data from events.
                 var rows = EventsToDataRows(events).ToArray();
 
                 // Prepare the bulk copy.

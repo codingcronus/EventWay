@@ -19,12 +19,13 @@ namespace EventWay.Test.Infrastructure
         {
             //_connectionString = InMemConnectionString;
             _aggregateId = Guid.Parse("e5cbb67b-c12f-42e0-8a32-a82a012df68a");
+            SqliteDbTool.CreateTables(_connectionString);
         }
 
         [Test]
         public void CanCreateDatabaseTables()
         {
-            using (var connection = new SQLiteConnection(InMemConnectionString))
+            using (var connection = new SQLiteConnection(_connectionString))
             {
                 // Create tables.
                 SqliteDbTool.CreateTables(connection);

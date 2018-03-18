@@ -36,33 +36,25 @@ namespace EventWay.Core
 
 		public async Task Save(IAggregate aggregate)
 		{
-			if (_aggregateTracking != null)
-			{
-				_aggregateTracking.TrackEvents(aggregate);
-			}
-
-			var orderedEvents = _aggregateRepository.Save(aggregate);
-
-			foreach (var @event in orderedEvents)
-			{
-				await _eventListener.Handle(@event);
-			}
+		    var a = new IAggregate[] {aggregate};
+		    await Save(a);
 		}
 
 		public async Task Save<T>(IEnumerable<T> aggregates) where T : IAggregate
 		{
-			if (!aggregates.Any())
-			{
-				return;
-			}
+		    var enumeratedAggregates = aggregates.ToArray();
 
-			if (_aggregateTracking != null)
-			{
-				_aggregateTracking.TrackEvents(aggregates);
-			}
-			var orderedEvents = _aggregateRepository.Save(aggregates);
+		    if (!enumeratedAggregates.Any())
+		        return;
+
+		    _aggregateTracking?.TrackEvents(enumeratedAggregates);
+
+		    var orderedEvents = _aggregateRepository.Save(enumeratedAggregates);
 
 			await _eventListener.Handle(orderedEvents);
+
+		    foreach (var aggregate in enumeratedAggregates)
+		        _aggregateCache.Set(aggregate);
 		}
 	}
 }

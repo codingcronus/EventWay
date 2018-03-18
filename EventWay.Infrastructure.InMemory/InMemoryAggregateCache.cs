@@ -8,7 +8,7 @@ namespace EventWay.Infrastructure.InMemory
     {
         private readonly ConcurrentDictionary<Guid, IAggregate> _cache = new ConcurrentDictionary<Guid, IAggregate>();
 
-        public void Set<T>(Guid aggregateId, T aggregate) where T : IAggregate => _cache[aggregateId] = aggregate;
+        public void Set<T>(T aggregate) where T : IAggregate => _cache[aggregate.Id] = aggregate;
 
         public bool Contains(Guid aggregateId) => _cache.ContainsKey(aggregateId);
 

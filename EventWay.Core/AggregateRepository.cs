@@ -80,7 +80,7 @@ namespace EventWay.Core
                 aggregate.ClearUncommittedEvents();
             }
 
-            _snapshotEventRepository.SaveSnapshotEvents(allSnapshotsToSave.ToArray());
+            _snapshotEventRepository?.SaveSnapshotEvents(allSnapshotsToSave.ToArray());
 
             return _eventRepository.SaveEvents(allEventsToSave.ToArray());
         }
