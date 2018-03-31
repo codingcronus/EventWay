@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("EventWay.Infrastructure.InMemory")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("EventWay is a modular Event Source + CQRS framework")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Async Aps")]
 [assembly: AssemblyProduct("EventWay.Infrastructure.InMemory")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
+[assembly: AssemblyCopyright("Copyright © Async Aps 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

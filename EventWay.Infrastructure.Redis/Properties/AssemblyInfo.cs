@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("EventWay.Infrastructure.Redis")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("EventWay is a modular Event Source + CQRS framework")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("EventWay.Infrastructure.Redis")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
+[assembly: AssemblyCompany("Async Aps")]
+[assembly: AssemblyProduct("EventWay")]
+[assembly: AssemblyCopyright("Copyright © Async Aps 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -17,7 +17,6 @@
 
     <dependencies>
       <dependency id="Microsoft.ApplicationInsights" version="2.4.0" />
-      
       <dependency id="Async.EventWay.Core" version="$version$" />
     </dependencies>
   </metadata>
