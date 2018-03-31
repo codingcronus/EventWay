@@ -71,10 +71,6 @@
     <Compile Include="SqliteSnapshotEventRepository.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EventWay.Core\EventWay.Core.csproj">
-      <Project>{e9944ab9-0d72-49ef-8d1a-21518a3f3cfb}</Project>
-      <Name>EventWay.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\EventWay.Query\EventWay.Query.csproj">
       <Project>{cb22e7a6-62db-4bf0-b9cd-a936a04be0c3}</Project>
       <Name>EventWay.Query</Name>

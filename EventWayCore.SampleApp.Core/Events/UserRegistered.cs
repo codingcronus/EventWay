@@ -1,10 +1,10 @@
 ﻿using EventWayCore.Core;
 
-namespace EventWay.SampleApp.Core.Commands
+namespace EventWayCore.SampleApp.Core.Events
 {
-    public class RegisterUser : IDomainCommand
+    public class UserRegistered : DomainEvent
     {
-        public RegisterUser(
+        public UserRegistered(
             string firstName,
             string lastName)
         {

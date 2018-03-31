@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <StartupObject>EventWayCore.SampleApp.Program</StartupObject>
+</PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EventWayCore.Core\EventWayCore.Core.csproj" />
+    <ProjectReference Include="..\EventWayCore.Infrastructure.CosmosDb\EventWayCore.Infrastructure.CosmosDb.csproj" />
+    <ProjectReference Include="..\EventWayCore.Infrastructure.MsSql\EventWayCore.Infrastructure.MsSql.csproj" />
+    <ProjectReference Include="..\EventWayCore.Infrastructure\EventWayCore.Infrastructure.csproj" />
+    <ProjectReference Include="..\EventWayCore.SampleApp.Application\EventWayCore.SampleApp.Application.csproj" />
+    <ProjectReference Include="..\EventWayCore.SampleApp.Core\EventWayCore.SampleApp.Core.csproj" />
+  </ItemGroup>
+</Project>

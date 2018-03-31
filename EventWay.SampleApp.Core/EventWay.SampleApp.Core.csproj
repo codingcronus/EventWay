@@ -46,9 +46,9 @@
     <Compile Include="User.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EventWay.Core\EventWay.Core.csproj">
-      <Project>{E9944AB9-0D72-49EF-8D1A-21518A3F3CFB}</Project>
-      <Name>EventWay.Core</Name>
+    <ProjectReference Include="..\EventWayCore.Core\EventWayCore.Core.csproj">
+      <Project>{68EEC038-0397-41E0-A374-0C3A1E13593A}</Project>
+      <Name>EventWayCore.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

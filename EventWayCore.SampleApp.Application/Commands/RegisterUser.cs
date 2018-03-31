@@ -1,8 +1,6 @@
-﻿using EventWayCore.Core;
-
-namespace EventWay.SampleApp.Core.Commands
+﻿namespace EventWayCore.SampleApp.Application.Commands
 {
-    public class RegisterUser : IDomainCommand
+    public class RegisterUser
     {
         public RegisterUser(
             string firstName,

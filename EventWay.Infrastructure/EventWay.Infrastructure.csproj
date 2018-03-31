@@ -36,12 +36,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EventWay.Core\EventWay.Core.csproj">
-      <Project>{E9944AB9-0D72-49EF-8D1A-21518A3F3CFB}</Project>
-      <Name>EventWay.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="app.config" />
     <None Include="EventWay.Infrastructure.nuspec" />
   </ItemGroup>

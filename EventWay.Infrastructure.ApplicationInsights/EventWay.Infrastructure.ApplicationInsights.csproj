@@ -55,12 +55,6 @@
     <None Include="EventWay.Infrastructure.ApplicationInsights.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\EventWay.Core\EventWay.Core.csproj">
-      <Project>{e9944ab9-0d72-49ef-8d1a-21518a3f3cfb}</Project>
-      <Name>EventWay.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -87,44 +87,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EventWay.Core\EventWay.Core.csproj">
-      <Project>{E9944AB9-0D72-49EF-8D1A-21518A3F3CFB}</Project>
-      <Name>EventWay.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EventWay.Infrastructure.ApplicationInsights\EventWay.Infrastructure.ApplicationInsights.csproj">
-      <Project>{96becf10-d1d7-4b80-b982-63ba620124b8}</Project>
-      <Name>EventWay.Infrastructure.ApplicationInsights</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EventWay.Infrastructure.CosmosDb\EventWay.Infrastructure.CosmosDb.csproj">
-      <Project>{249fb03c-f3d8-4fbf-8270-98efb68bf6b2}</Project>
-      <Name>EventWay.Infrastructure.CosmosDb</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EventWay.Infrastructure.InMemory\EventWay.Infrastructure.InMemory.csproj">
-      <Project>{ba598541-be9f-412f-8356-0f53760d641c}</Project>
-      <Name>EventWay.Infrastructure.InMemory</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EventWay.Infrastructure.MsSql\EventWay.Infrastructure.MsSql.csproj">
-      <Project>{e65693a1-5be8-41c2-970e-4d9f48433b9a}</Project>
-      <Name>EventWay.Infrastructure.MsSql</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EventWay.Infrastructure.Redis\EventWay.Infrastructure.Redis.csproj">
-      <Project>{e7d9bc5b-84b3-470c-a77a-b38c15ac0d0a}</Project>
-      <Name>EventWay.Infrastructure.Redis</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EventWay.Infrastructure.Sqlite\EventWay.Infrastructure.Sqlite.csproj">
-      <Project>{2f4326aa-e60f-4d42-9aef-9dd41738a5de}</Project>
-      <Name>EventWay.Infrastructure.Sqlite</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EventWay.Infrastructure\EventWay.Infrastructure.csproj">
-      <Project>{72BD6C9C-6C0C-421B-932A-003DA6F4F9F9}</Project>
-      <Name>EventWay.Infrastructure</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EventWay.Query\EventWay.Query.csproj">
-      <Project>{CB22E7A6-62DB-4BF0-B9CD-A936A04BE0C3}</Project>
-      <Name>EventWay.Query</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
