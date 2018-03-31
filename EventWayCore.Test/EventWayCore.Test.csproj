@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoFixture" Version="4.2.0" />
+    <PackageReference Include="NUnit" Version="3.10.1" />
+    <PackageReference Include="sqlite-net-standard" Version="1.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EventWayCore.Core\EventWayCore.Core.csproj" />
+    <ProjectReference Include="..\EventWayCore.Infrastructure.ApplicationInsights\EventWayCore.Infrastructure.ApplicationInsights.csproj" />
+    <ProjectReference Include="..\EventWayCore.Infrastructure.CosmosDb\EventWayCore.Infrastructure.CosmosDb.csproj" />
+    <ProjectReference Include="..\EventWayCore.Infrastructure.InMemory\EventWayCore.Infrastructure.InMemory.csproj" />
+    <ProjectReference Include="..\EventWayCore.Infrastructure.MsSql\EventWayCore.Infrastructure.MsSql.csproj" />
+    <ProjectReference Include="..\EventWayCore.Infrastructure.Redis\EventWayCore.Infrastructure.Redis.csproj" />
+    <ProjectReference Include="..\EventWayCore.Infrastructure.Sqlite\EventWayCore.Infrastructure.Sqlite.csproj" />
+    <ProjectReference Include="..\EventWayCore.Infrastructure\EventWayCore.Infrastructure.csproj" />
+    <ProjectReference Include="..\EventWayCore.Query\EventWayCore.Query.csproj" />
+  </ItemGroup>
+
+</Project>

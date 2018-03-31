@@ -11,13 +11,18 @@
     <RepositoryUrl>https://github.com/tigerdyret/EventWay</RepositoryUrl>
     <PackageProjectUrl>https://github.com/tigerdyret/EventWay</PackageProjectUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>Async.EventWayCore.Core</PackageId>
+    <PackageId>Async.EventWayCore.Infrastructure.MsSql</PackageId>
     <Version>1.0.1</Version>
     <PackageReleaseNotes>Downgraded to Newtonsoft.Json 10.0.3 to match Azure Functions dependency.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="dapper" Version="1.50.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EventWayCore.Core\EventWayCore.Core.csproj" />
+    <ProjectReference Include="..\EventWayCore.Query\EventWayCore.Query.csproj" />
   </ItemGroup>
 
 </Project>

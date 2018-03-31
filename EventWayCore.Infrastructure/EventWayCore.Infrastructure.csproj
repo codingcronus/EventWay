@@ -11,13 +11,13 @@
     <RepositoryUrl>https://github.com/tigerdyret/EventWay</RepositoryUrl>
     <PackageProjectUrl>https://github.com/tigerdyret/EventWay</PackageProjectUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>Async.EventWayCore.Core</PackageId>
+    <PackageId>Async.EventWayCore.Infrastructure</PackageId>
     <Version>1.0.1</Version>
     <PackageReleaseNotes>Downgraded to Newtonsoft.Json 10.0.3 to match Azure Functions dependency.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <ProjectReference Include="..\EventWayCore.Core\EventWayCore.Core.csproj" />
   </ItemGroup>
 
 </Project>
