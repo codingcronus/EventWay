@@ -53,12 +53,12 @@ namespace EventWay.SampleApp
         public void Initialize()
         {
             // Configuration Parameters
-            var eventDatabaseConnectionString = "Data Source=localhost;Initial Catalog=eventway-sample-db;Integrated Security=True;Connect Timeout=15;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+            var eventDatabaseConnectionString = "Data Source=localhost;Initial Catalog=eventway;Integrated Security=True;Connect Timeout=15;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
             var projectionMetadataDatabaseConnectionString = eventDatabaseConnectionString;
 
             var cosmosDbEndpoint = "https://localhost:8081"; // This is the default endpoint for local emulator-instances of the Cosmos DB
-            var cosmosDbAuthKey = "<REPLACE WITH YOUR COSMOS DB AUTH KEY>";
-            var cosmosDbDatabaseId = "eventway-sample-db";
+            var cosmosDbAuthKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
+            var cosmosDbDatabaseId = "eventway";
             var cosmosDbCollectionId = "projections";
             var offerThroughput = 10000;
             var noOfPartitions = 1000;
