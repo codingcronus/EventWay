@@ -252,7 +252,7 @@ namespace EventWay.Infrastructure.CosmosDb
             return target.GetType().GetProperty(propName).GetValue(target, null) as string;
         }
 
-        private Uri GetCollectionUri()
+        public Uri GetCollectionUri()
         {
             if (_collectionUri != null)
             {

@@ -8,7 +8,7 @@ namespace EventWay.Infrastructure.CosmosDb
     /// <summary>
     /// Ref: https://blogs.msdn.microsoft.com/bigdatasupport/2015/09/02/dealing-with-requestratetoolarge-errors-in-azure-documentdb-and-testing-performance/
     /// </summary>
-    internal class DocumentDbRetryPolicy
+    public class DocumentDbRetryPolicy
     {
         const int RetriesMax = 3;
         public static async Task<V> ExecuteWithRetries<V>(Func<Task<V>> function)
