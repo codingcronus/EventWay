@@ -75,7 +75,6 @@
     <Compile Include="Infrastructure\AggregateRepositoryWithSqlSpecs.cs" />
     <Compile Include="Infrastructure\DocumentDbQueryModelRepositorySpecs.cs" />
     <Compile Include="Infrastructure\SqliteSnapshotEventsRepositorySpecs.cs" />
-    <Compile Include="Infrastructure\QueryModelStoreWithDocumentDbQueryAndSqlProjectionSpecs.cs" />
     <Compile Include="Infrastructure\SqliteEventsRepositorySpecs.cs" />
     <Compile Include="Infrastructure\SqlServerProjectionMetadataRepositorySpecs.cs" />
     <Compile Include="Infrastructure\SqlServerEventsRepositorySpecs.cs" />

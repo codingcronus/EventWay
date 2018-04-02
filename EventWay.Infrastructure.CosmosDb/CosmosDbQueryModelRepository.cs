@@ -7,7 +7,6 @@ using EventWay.Query;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
-using Microsoft.Azure.Documents.SystemFunctions;
 
 namespace EventWay.Infrastructure.CosmosDb
 {
@@ -42,6 +41,11 @@ namespace EventWay.Infrastructure.CosmosDb
         {
             var policy = new ConnectionPolicy { EnableEndpointDiscovery = false };
             _client = new DocumentClient(new Uri(_endpoint), _authKey, policy);
+        }
+
+        public DocumentClient GetClient()
+        {
+            return _client;
         }
 
         public void Initialize()

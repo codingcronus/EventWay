@@ -15,5 +15,11 @@ namespace EventWay.Query
 
         public Guid AggregateId { get; set; }
         public string Type => GetType().Name;
+
+        // Factory method
+        public static TQueryModel CreateQueryModel<TQueryModel>(Guid id)
+        {
+            return (TQueryModel)Activator.CreateInstance(typeof(TQueryModel), id);
+        }
     }
 }

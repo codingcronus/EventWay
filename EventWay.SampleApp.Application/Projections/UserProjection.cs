@@ -44,10 +44,11 @@ namespace EventWay.SampleApp.Application.Projections
             ProcessEvents<User>().Wait();
         }
 
-        private async Task Handle(UserRegistered @event, QueryModelStore queryModelStore)
+        private async Task Handle(UserRegistered @event, Action acknowledgeEvent)
         {
             // Get current instance of query model
-            var queryModel = await queryModelStore.GetQueryModel<UserQueryModel>(@event.AggregateId, createIfMissing: true);
+            var queryModel = await QueryById(@event.AggregateId) ??
+                             QueryModel.CreateQueryModel<UserQueryModel>(@event.AggregateId);
 
             // Set Query Model properties
             queryModel.FirstName = @event.FirstName;
@@ -55,7 +56,9 @@ namespace EventWay.SampleApp.Application.Projections
             queryModel.DisplayName = @event.FirstName + " " + @event.LastName;
 
             // Create or Update Query model in Read Store (E.g. CosmosDB)
-            await queryModelStore.SaveQueryModel(queryModel);
+            await QueryModelRepository.Save(queryModel);
+
+            acknowledgeEvent();
         }
     }
 }
