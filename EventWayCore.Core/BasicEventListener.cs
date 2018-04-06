@@ -54,13 +54,10 @@ namespace EventWayCore.Core
 			{
 				var eventType = groupEvent.Key;
 				var eventPayloads = groupEvent.ToArray();
-				if (!_eventCollectionHandlers.ContainsKey(eventType))
-				{
-					Console.WriteLine($"Received unhandled event: {eventType.AssemblyQualifiedName}");
-					return;
-				}
+			    if (!_eventCollectionHandlers.ContainsKey(eventType))
+			        return;
 
-				foreach (var handler in _eventCollectionHandlers[eventType])
+			    foreach (var handler in _eventCollectionHandlers[eventType])
 					await handler(eventPayloads);
 			}
 		}
