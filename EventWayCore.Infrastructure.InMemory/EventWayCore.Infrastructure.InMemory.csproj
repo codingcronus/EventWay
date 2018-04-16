@@ -12,7 +12,7 @@
     <PackageProjectUrl>https://github.com/tigerdyret/EventWay</PackageProjectUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Async.EventWayCore.Infrastructure.InMemory</PackageId>
-    <Version>1.1.1</Version>
+    <Version>1.1.2</Version>
     <PackageReleaseNotes>Projection updated and QueryModelStore removed.</PackageReleaseNotes>
   </PropertyGroup>
 
