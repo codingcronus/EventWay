@@ -3,12 +3,13 @@ using EventWayCore.Infrastructure.MsSql;
 using EventWayCore.Query;
 using NUnit.Framework;
 
-namespace EventWay.Test.Infrastructure
+namespace EventWayCore.Test.Infrastructure
 {
     [TestFixture(Category = "Integration")]
     public class SqlServerProjectionMetadataRepositorySpecs
     {
-        private readonly string _connectionString = "Data Source=localhost;Initial Catalog=vanda-db-dev;Integrated Security=True;Connect Timeout=15;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+        //private readonly string _connectionString = "Data Source=localhost;Initial Catalog=vanda-db-dev;Integrated Security=True;Connect Timeout=15;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+        private readonly string _connectionString = "Server=.\\SQLEXPRESS;Database=VerdunEvents;Trusted_Connection=True;";
 
         [Test]
         public void ShouldSuccesfullyCreateAndHydrateProjectionMetadata()

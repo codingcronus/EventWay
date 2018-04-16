@@ -12,8 +12,8 @@
     <PackageProjectUrl>https://github.com/tigerdyret/EventWay</PackageProjectUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Async.EventWayCore.Infrastructure.Redis</PackageId>
-    <Version>1.0.1</Version>
-    <PackageReleaseNotes>Downgraded to Newtonsoft.Json 10.0.3 to match Azure Functions dependency.</PackageReleaseNotes>
+    <Version>1.1.1</Version>
+    <PackageReleaseNotes>Projection updated and QueryModelStore removed.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

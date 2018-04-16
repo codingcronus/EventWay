@@ -8,7 +8,6 @@ namespace EventWayCore.Query
         public string ContinuationToken { get; private set; }
         public IEnumerable<T> Data { get; private set; }
         
-
         public PagedResult(IEnumerable<T> data, int count, string continuationToken)
         {
             Count = count;

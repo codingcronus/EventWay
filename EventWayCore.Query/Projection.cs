@@ -18,67 +18,66 @@ namespace EventWayCore.Query
 			IProjectionMetadataRepository projectionMetadataRepository)
 		{
 			_projectionId = projectionId;
-
 			_eventRepository = eventRepository ?? throw new ArgumentNullException(nameof(eventRepository));
 			_eventListener = eventListener ?? throw new ArgumentNullException(nameof(eventListener));
 			QueryModelRepository = queryModelRepository ?? throw new ArgumentNullException(nameof(queryModelRepository));
 			_projectionMetadataRepository = projectionMetadataRepository ?? throw new ArgumentNullException(nameof(projectionMetadataRepository));
 
-			_eventHandlers = new Dictionary<Type, Func<object, QueryModelStore, Task>>();
-			_eventCollectionHandlers = new Dictionary<Type, Func<List<object>, QueryModelStore, Task>>();
+		    _eventHandlers = new Dictionary<Type, Func<object, Action, Task>>();
+		    _eventCollectionHandlers = new Dictionary<Type, Func<List<object>, Action, Task>>();
 		}
 
-		private readonly Guid _projectionId;
+        private readonly Guid _projectionId;
 
 		private readonly IEventRepository _eventRepository;
 		private readonly IEventListener _eventListener;
 		protected readonly IQueryModelRepository QueryModelRepository;
 		private readonly IProjectionMetadataRepository _projectionMetadataRepository;
 
-		private readonly Dictionary<Type, Func<object, QueryModelStore, Task>> _eventHandlers;
-		private readonly Dictionary<Type, Func<List<object>, QueryModelStore, Task>> _eventCollectionHandlers;
+	    private readonly Dictionary<Type, Func<object, Action, Task>> _eventHandlers;
+	    private readonly Dictionary<Type, Func<List<object>, Action, Task>> _eventCollectionHandlers;
 
-		public abstract void Listen();
+        public abstract void Listen();
 
-		protected void OnEvent<T>(Func<T, QueryModelStore, Task> handler) where T : class
-		{
-			if (_eventHandlers.ContainsKey(typeof(T)))
-				_eventHandlers[typeof(T)] = (e, queryModelStore) => handler(e as T, queryModelStore);
-			else
-				_eventHandlers.Add(typeof(T), (e, queryModelStore) => handler(e as T, queryModelStore));
+	    protected void OnEvent<T>(Func<T, Action, Task> handler) where T : class
+	    {
+	        if (_eventHandlers.ContainsKey(typeof(T)))
+	            _eventHandlers[typeof(T)] = (e, acknowledgeEvent) => handler(e as T, acknowledgeEvent);
+	        else
+	            _eventHandlers.Add(typeof(T), (e, acknowledgeEvent) => handler(e as T, acknowledgeEvent));
 
-			// Triggers when new events are saved
-			_eventListener.OnEvent<T>(async @event =>
-			{
-				await ProcessEvent(@event);
-			});
-		}
+	        // Triggers when new events are saved
+	        _eventListener.OnEvent<T>(async @event =>
+	        {
+	            await ProcessEvent(@event);
+	        });
+	    }
 
 
-		protected void OnEvents<T>(Func<List<T>, QueryModelStore, Task> handler) where T : class
-		{
-			if (_eventCollectionHandlers.ContainsKey(typeof(T)))
-				_eventCollectionHandlers[typeof(T)] = (e, queryModelStore) => handler(((IList)e).Cast<T>().ToList(), queryModelStore);
-			else
-				_eventCollectionHandlers.Add(typeof(T), (e, queryModelStore) => handler(((IList)e).Cast<T>().ToList(), queryModelStore));
+	    protected void OnEvents<T>(Func<List<T>, Action, Task> handler) where T : class
+	    {
+	        if (_eventCollectionHandlers.ContainsKey(typeof(T)))
+	            _eventCollectionHandlers[typeof(T)] = (e, acknowledgeEvent) => handler(((IList)e).Cast<T>().ToList(), acknowledgeEvent);
+	        else
+	            _eventCollectionHandlers.Add(typeof(T), (e, acknowledgeEvent) => handler(((IList)e).Cast<T>().ToList(), acknowledgeEvent));
 
-			// Triggers when new events are saved
-			_eventListener.OnEvents<T>(async @event =>
-			{
-				await ProcessEvent(@event);
-			});
-		}
+	        // Triggers when new events are saved
+	        _eventListener.OnEvents<T>(async @event =>
+	        {
+	            await ProcessEvent(@event);
+	        });
+	    }
 
-		private QueryModelStore GetQueryModelStoreFromEvent(OrderedEventPayload @event)
-		{
-			return new QueryModelStore(
-					QueryModelRepository,
-					_projectionMetadataRepository,
-					@event.Ordering,
-					_projectionId);
-		}
+	    public void AcknowledgeEvent(long eventOffset)
+	    {
+	        var projectionMeta = new ProjectionMetadata(
+	            _projectionId,
+	            eventOffset + 1);
 
-		private async Task<int> ProcessEvent(OrderedEventPayload @event)
+	        _projectionMetadataRepository.UpdateEventOffset(projectionMeta);
+	    }
+
+        private async Task<int> ProcessEvent(OrderedEventPayload @event)
 		{
 			var eventPayload = @event.EventPayload;
 			var eventType = eventPayload.GetType();
@@ -88,15 +87,13 @@ namespace EventWayCore.Query
 			if (!_eventHandlers.ContainsKey(eventType))
 				return await Task.FromResult(0);
 
-			var queryModelStore = GetQueryModelStoreFromEvent(@event);
-
 			// Invoke event handler for event
 			try
 			{
 				var eventHandler = _eventHandlers[eventType];
-				await eventHandler(@event.EventPayload, queryModelStore);
+			    await eventHandler(@event.EventPayload, () => AcknowledgeEvent(@event.Ordering));
 
-				return await Task.FromResult(1);
+                return await Task.FromResult(1);
 			}
 			catch (Exception e)
 			{
@@ -118,16 +115,16 @@ namespace EventWayCore.Query
 			if (!_eventCollectionHandlers.ContainsKey(eventType))
 				return await Task.FromResult(0);
 
-			var queryModelStore = GetQueryModelStoreFromEvent(@event.FirstOrDefault(x => x.Ordering == @event.Max(p => p.Ordering)));
-
 			// Invoke event handler for event
 			try
 			{
+			    var eventOffset = @event
+			        .First(x => x.Ordering == @event.Max(p => p.Ordering))
+			        .Ordering;
+                var eventHandler = _eventCollectionHandlers[eventType];
 
-				var eventHandler = _eventCollectionHandlers[eventType];
-				await eventHandler(eventPayloads, queryModelStore);
-
-				return await Task.FromResult(1);
+			    await eventHandler(eventPayloads, () => AcknowledgeEvent(eventOffset));
+                return await Task.FromResult(1);
 			}
 			catch (Exception e)
 			{
