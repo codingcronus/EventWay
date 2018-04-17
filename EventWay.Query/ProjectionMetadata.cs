@@ -6,8 +6,14 @@ namespace EventWay.Query
     {
         public ProjectionMetadata(
             Guid projectionId,
+            long eventOffset)
+            : this(projectionId, eventOffset, null)
+        { }
+
+        public ProjectionMetadata(
+            Guid projectionId,
             long eventOffset,
-            string projectionType = null)
+            string projectionType)
         {
             ProjectionId = projectionId;
             EventOffset = eventOffset;
