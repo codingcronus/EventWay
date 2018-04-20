@@ -16,15 +16,6 @@ namespace EventWay.Query
         Task<IEnumerable<T>> QueryAll<T>(Expression<Func<T, bool>> predicate) where T : QueryModel;
 
         Task DeleteById<T>(Guid aggregateId) where T : QueryModel;
-        Task DeleteByIds<T>(List<Guid> aggregateIds) where T : QueryModel;
-        Task Save<T>(List<T> queryModels) where T : QueryModel;
-        Task<List<T>> GetByIds<T>(List<Guid> aggregateIds) where T : QueryModel;
-        Task<PagedResult<T>> GetPagedList<T>(PagedQuery pagedQuery) where T : QueryModel;
-        Task<PagedResult<T>> GetPagedList<T>(PagedQuery pagedQuery, Expression<Func<T, bool>> predicate) where T : QueryModel;
-        Task<bool> DoesItemExist<T>(Guid id) where T : QueryModel;
-        Task<bool> DoesItemExist<T>(Expression<Func<T, bool>> predicate) where T : QueryModel;
-        Task<List<dynamic>> ExecuteRawSql(string sql);
-        Task ClearCollectionAsync();
 
         /*
 		Task SaveQueryModelList<T>(List<T> queryModels) where T : QueryModel;
