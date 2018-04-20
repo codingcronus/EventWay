@@ -46,12 +46,12 @@ namespace EventWay.SampleApp
             return result.ToList();
         }
 
-        public async Task<PagedResult<T>> GetPagedListAsync<T>(PagedQuery pagedQuery) where T : QueryModel
+        public async Task<PagedResult<T>> GetPagedList<T>(PagedQuery pagedQuery) where T : QueryModel
         {
-            return await GetPagedListAsync<T>(pagedQuery, null);
+            return await GetPagedList<T>(pagedQuery, null);
         }
 
-        public async Task<PagedResult<T>> GetPagedListAsync<T>(PagedQuery pagedQuery, Expression<Func<T, bool>> predicate) where T : QueryModel
+        public async Task<PagedResult<T>> GetPagedList<T>(PagedQuery pagedQuery, Expression<Func<T, bool>> predicate) where T : QueryModel
         {
             return await DocumentDbRetryPolicy.ExecuteWithRetries(
               () => GetPagedListAsyncInternal<T>(pagedQuery, predicate)
@@ -118,6 +118,41 @@ namespace EventWay.SampleApp
         public Task DeleteById<T>(Guid aggregateId) where T : QueryModel
         {
             return _repo.DeleteById<T>(aggregateId);
+        }
+
+        public Task DeleteByIds<T>(List<Guid> ids) where T : QueryModel
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Save<T>(List<T> queryModels) where T : QueryModel
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<T>> GetByIds<T>(List<Guid> aggregateIds) where T : QueryModel
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> DoesItemExist<T>(Guid id) where T : QueryModel
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> DoesItemExist<T>(Expression<Func<T, bool>> predicate) where T : QueryModel
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<dynamic>> ExecuteRawSql(string sql)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task ClearCollectionAsync()
+        {
+            throw new NotImplementedException();
         }
     }
 }

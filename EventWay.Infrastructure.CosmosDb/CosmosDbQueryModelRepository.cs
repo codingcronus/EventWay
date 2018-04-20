@@ -133,24 +133,6 @@ namespace EventWay.Infrastructure.CosmosDb
             );
         }
 
-
-        //TODO: Should this method be deleted?
-        public async Task<bool> DoesItemExist<T>(Guid id) where T : QueryModel
-        {
-            return await DocumentDbRetryPolicy.ExecuteWithRetries(
-                () => DoesItemExistInternal<T>(id)
-                );
-        }
-
-        private async Task<bool> DoesItemExistInternal<T>(Guid id) where T : QueryModel
-        {
-            var options = CreateFeedOptions(1);
-            var countQuery = _client.CreateDocumentQuery<T>(GetCollectionUri(), options).Where(p => p.id == id);
-            var count = await countQuery.CountAsync();
-
-            return count > 0;
-        }
-
         /////////////////////////////////////////
         // Utility Methods
         /////////////////////////////////////////
@@ -273,6 +255,143 @@ namespace EventWay.Infrastructure.CosmosDb
                     }
                 }
             }
+        }
+
+        public async Task DeleteByIds<T>(List<Guid> aggregateIds) where T : QueryModel
+        {
+            var tasks = new List<Task>();
+            foreach (var aggregateId in aggregateIds)
+            {
+                tasks.Add(DeleteById<T>(aggregateId));
+            }
+            await DocumentDbParallelHelper.RunParallel(_offerThroughput, tasks);
+        }
+
+        public async Task Save<T>(List<T> queryModels) where T : QueryModel
+        {
+            var tasks = new List<Task>();
+            foreach (var docModel in queryModels)
+            {
+                tasks.Add(Save(docModel));
+            }
+            await DocumentDbParallelHelper.RunParallel(_noOfParallelTasks, tasks);
+        }
+
+        public async Task<List<T>> GetByIds<T>(List<Guid> aggregateIds) where T : QueryModel
+        {
+            return await DocumentDbRetryPolicy.ExecuteWithRetries(
+                () => GetByIdsInternal<T>(aggregateIds)
+            );
+        }
+
+        private Task<List<T>> GetByIdsInternal<T>(List<Guid> aggregateIds) where T : QueryModel
+        {
+            try
+            {
+                var options = CreateFeedOptions(-1);
+                var result = _client.CreateDocumentQuery<T>(GetCollectionUri(), options)
+                .Where(x => x.Type == typeof(T).Name && aggregateIds.Contains(x.AggregateId))
+                .ToList();
+
+                return Task.FromResult(result);
+            }
+            catch (DocumentClientException e)
+            {
+                if (e.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    return null;
+
+                throw;
+            }
+        }
+
+        public async Task<PagedResult<T>> GetPagedList<T>(PagedQuery pagedQuery) where T : QueryModel
+        {
+            return await GetPagedList<T>(pagedQuery, null);
+        }
+
+        public async Task<PagedResult<T>> GetPagedList<T>(PagedQuery pagedQuery, Expression<Func<T, bool>> predicate) where T : QueryModel
+        {
+            return await DocumentDbRetryPolicy.ExecuteWithRetries(
+              () => GetPagedListAsyncInternal<T>(pagedQuery, predicate)
+              );
+        }
+
+        private async Task<PagedResult<T>> GetPagedListAsyncInternal<T>(PagedQuery pagedQuery, Expression<Func<T, bool>> predicate) where T : QueryModel
+        {
+            var query = CreatePagedListQuery(pagedQuery, predicate);
+
+            var results = await query.AsDocumentQuery().ExecuteNextAsync<T>();
+            //Should not use count in this way, currently Cosmos does not support count using group by, it will make query very slow when db was large
+            //var count = await QueryCountAsyncInternal<T>();
+            var count = 0;
+            return new PagedResult<T>(results.ToList().AsReadOnly(), count, results.ResponseContinuation);
+        }
+
+        public IQueryable<T> CreatePagedListQuery<T>(PagedQuery pagedQuery, Expression<Func<T, bool>> predicate) where T : QueryModel
+        {
+            var options = CreateFeedOptions(pagedQuery.MaxItemCount);
+            if (!string.IsNullOrEmpty(pagedQuery.ContinuationToken))
+            {
+                options.RequestContinuation = pagedQuery.ContinuationToken;
+            }
+
+            var query = _client.CreateDocumentQuery<T>(GetCollectionUri(), options)
+                .Where(x => x.Type == typeof(T).Name);
+            if (predicate != null)
+            {
+                query = query.Where(predicate);
+            }
+
+            return query;
+        }
+
+        public async Task<bool> DoesItemExist<T>(Guid id) where T : QueryModel
+        {
+            return await DocumentDbRetryPolicy.ExecuteWithRetries(
+                () => DoesItemExistInternal<T>(id)
+                );
+        }
+
+        private async Task<bool> DoesItemExistInternal<T>(Guid id) where T : QueryModel
+        {
+            var options = CreateFeedOptions(1);
+            var countQuery = _client.CreateDocumentQuery<T>(GetCollectionUri(), options).Where(p => p.id == id);
+            var count = await countQuery.CountAsync();
+
+            return count > 0;
+        }
+
+        public async Task<bool> DoesItemExist<T>(Expression<Func<T, bool>> predicate) where T : QueryModel
+        {
+            return await DocumentDbRetryPolicy.ExecuteWithRetries(
+                () => DoesItemExistInternal<T>(predicate)
+                );
+        }
+
+        private async Task<bool> DoesItemExistInternal<T>(Expression<Func<T, bool>> predicate) where T : QueryModel
+        {
+            var options = CreateFeedOptions(-1);
+            var query = _client.CreateDocumentQuery<T>(GetCollectionUri(), options)
+                .Where(x => x.Type == typeof(T).Name)
+                .Where(predicate);
+
+            var count = await query.CountAsync();
+            return count > 0;
+        }
+
+        public async Task<List<dynamic>> ExecuteRawSql(string sql)
+        {
+            return await DocumentDbRetryPolicy.ExecuteWithRetries(
+                () => ExecuteRawSqlInternal(sql)
+                );
+        }
+
+        private async Task<List<dynamic>> ExecuteRawSqlInternal(string sql)
+        {
+            var options = CreateFeedOptions(-1);
+            var query = _client.CreateDocumentQuery<dynamic>(GetCollectionUri(), sql, options).AsDocumentQuery();
+            var result = await query.ExecuteNextAsync<dynamic>();
+            return result.ToList();
         }
     }
 }
