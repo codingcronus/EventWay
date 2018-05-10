@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace EventWay.Core
@@ -18,12 +16,10 @@ namespace EventWay.Core
 		    IAggregateTracking aggregateTracking = null,
 		    IAggregateCache aggregateCache = null)
 		{
-			if (aggregateRepository == null) throw new ArgumentNullException(nameof(aggregateRepository));
-			if (eventListener == null) throw new ArgumentNullException(nameof(eventListener));
+		    _aggregateRepository = aggregateRepository ?? throw new ArgumentNullException(nameof(aggregateRepository));
+			_eventListener = eventListener ?? throw new ArgumentNullException(nameof(eventListener));
 
-			_aggregateRepository = aggregateRepository;
-			_aggregateTracking = aggregateTracking;
-			_eventListener = eventListener;
+		    _aggregateTracking = aggregateTracking;
 		    _aggregateCache = aggregateCache;
         }
 
@@ -40,24 +36,14 @@ namespace EventWay.Core
 
 		public async Task Save(IAggregate aggregate)
 		{
-		    var a = new IAggregate[] {aggregate};
-		    await Save(a);
-		}
+		    _aggregateTracking?.TrackEvents(aggregate);
 
-		public async Task Save<T>(IEnumerable<T> aggregates) where T : IAggregate
-		{
-		    var enumeratedAggregates = aggregates.ToArray();
+		    var orderedEvents = _aggregateRepository.Save(aggregate);
 
-		    if (!enumeratedAggregates.Any())
-		        return;
-
-		    _aggregateTracking?.TrackEvents(enumeratedAggregates);
-
-		    var orderedEvents = _aggregateRepository.Save(enumeratedAggregates);
-
-			await _eventListener.Handle(orderedEvents);
+		    foreach (var @event in orderedEvents)
+			    await _eventListener.Handle(@event);
         
-		    _aggregateCache?.Set(enumeratedAggregates);
+		    _aggregateCache?.Set(aggregate);
 		}
 	}
 }

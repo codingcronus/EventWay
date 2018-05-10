@@ -40,6 +40,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventWay.Infrastructure.InM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventWay.Infrastructure.Redis", "EventWay.Infrastructure.Redis\EventWay.Infrastructure.Redis.csproj", "{E7D9BC5B-84B3-470C-A77A-B38C15AC0D0A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{3F2559B6-FDF4-4BD6-B939-C7390687D76D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -103,12 +105,19 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{72BD6C9C-6C0C-421B-932A-003DA6F4F9F9} = {3F2559B6-FDF4-4BD6-B939-C7390687D76D}
+		{E65693A1-5BE8-41C2-970E-4D9F48433B9A} = {3F2559B6-FDF4-4BD6-B939-C7390687D76D}
+		{249FB03C-F3D8-4FBF-8270-98EFB68BF6B2} = {3F2559B6-FDF4-4BD6-B939-C7390687D76D}
+		{96BECF10-D1D7-4B80-B982-63BA620124B8} = {3F2559B6-FDF4-4BD6-B939-C7390687D76D}
 		{25C06E5E-A855-4762-883B-147F871061FE} = {1DB06867-FCF3-441A-84AA-E0268AE50F3B}
 		{E26F7E24-9964-434C-B38D-A9C863534D66} = {1DB06867-FCF3-441A-84AA-E0268AE50F3B}
 		{81A3910E-BD8D-4AC3-889D-5DBD11E61EC0} = {1DB06867-FCF3-441A-84AA-E0268AE50F3B}
+		{2F4326AA-E60F-4D42-9AEF-9DD41738A5DE} = {3F2559B6-FDF4-4BD6-B939-C7390687D76D}
+		{BA598541-BE9F-412F-8356-0F53760D641C} = {3F2559B6-FDF4-4BD6-B939-C7390687D76D}
+		{E7D9BC5B-84B3-470C-A77A-B38C15AC0D0A} = {3F2559B6-FDF4-4BD6-B939-C7390687D76D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8
 		SolutionGuid = {63E7F525-07F5-4BCD-8E18-974D37DE2D1F}
+		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8
 	EndGlobalSection
 EndGlobal

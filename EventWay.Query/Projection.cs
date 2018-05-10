@@ -24,7 +24,6 @@ namespace EventWay.Query
 			_projectionMetadataRepository = projectionMetadataRepository ?? throw new ArgumentNullException(nameof(projectionMetadataRepository));
 
 			_eventHandlers = new Dictionary<Type, Func<object, Action, Task>>();
-			_eventCollectionHandlers = new Dictionary<Type, Func<List<object>, Action, Task>>();
 		}
 
 		private readonly Guid _projectionId;
@@ -35,7 +34,6 @@ namespace EventWay.Query
 		private readonly IProjectionMetadataRepository _projectionMetadataRepository;
 
 		private readonly Dictionary<Type, Func<object, Action, Task>> _eventHandlers;
-		private readonly Dictionary<Type, Func<List<object>, Action, Task>> _eventCollectionHandlers;
 
 		public abstract void Listen();
 
@@ -48,21 +46,6 @@ namespace EventWay.Query
 
 			// Triggers when new events are saved
 			_eventListener.OnEvent<T>(async @event =>
-			{
-				await ProcessEvent(@event);
-			});
-		}
-
-
-		protected void OnEvents<T>(Func<List<T>, Action, Task> handler) where T : class
-		{
-			if (_eventCollectionHandlers.ContainsKey(typeof(T)))
-				_eventCollectionHandlers[typeof(T)] = (e, acknowledgeEvent) => handler(((IList)e).Cast<T>().ToList(), acknowledgeEvent);
-			else
-				_eventCollectionHandlers.Add(typeof(T), (e, acknowledgeEvent) => handler(((IList)e).Cast<T>().ToList(), acknowledgeEvent));
-
-			// Triggers when new events are saved
-			_eventListener.OnEvents<T>(async @event =>
 			{
 				await ProcessEvent(@event);
 			});
@@ -105,38 +88,6 @@ namespace EventWay.Query
 			//return await Task.FromResult(0);
 		}
 
-		private async Task<int> ProcessEvent(OrderedEventPayload[] @event)
-		{
-			var eventPayloads = @event.Select(x => x.EventPayload).ToList();
-			var eventType = eventPayloads[0].GetType();
-
-			// Do we have an event listener for this event type?
-			// TODO: This can be removed once we only get typed events
-			if (!_eventCollectionHandlers.ContainsKey(eventType))
-				return await Task.FromResult(0);
-
-			// Invoke event handler for event
-			try
-			{
-			    var eventOffset = @event
-                    .First(x => x.Ordering == @event.Max(p => p.Ordering))
-                    .Ordering;
-
-                var eventHandler = _eventCollectionHandlers[eventType];
-				await eventHandler(eventPayloads, () => AcknowledgeEvent(eventOffset));
-
-				return await Task.FromResult(1);
-			}
-			catch (Exception e)
-			{
-				//TODO: Handle exception
-				Trace.TraceError($"Error while processing event {eventType.FullName} in Projection {this.GetType().FullName}\nException: {e.ToString()}");
-				throw;
-			}
-
-			//return await Task.FromResult(0);
-		}
-
 		protected async Task ProcessEvents<TAggregate>() where TAggregate : Aggregate
 		{
 			// Get projection metadata
@@ -153,9 +104,7 @@ namespace EventWay.Query
 			var events = _eventRepository.GetEvents<TAggregate>(lastProcessedOffset);
 
 			foreach (var @event in events)
-			{
-				await ProcessEvent(@event);
-			}
+			    await ProcessEvent(@event);
 		}
 	}
 }

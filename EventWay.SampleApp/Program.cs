@@ -3,13 +3,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventWay.Core;
 using EventWay.Infrastructure;
-using EventWay.Infrastructure.ApplicationInsights;
 using EventWay.Infrastructure.CosmosDb;
 using EventWay.Infrastructure.MsSql;
 using EventWay.SampleApp.Application;
 using EventWay.SampleApp.Application.Projections;
 using EventWay.SampleApp.Application.QueryModels;
-using EventWay.SampleApp.Core.Commands;
 
 namespace EventWay.SampleApp
 {

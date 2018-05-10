@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace EventWay.Core
@@ -26,16 +25,6 @@ namespace EventWay.Core
 			_eventHandlers[eventType].Add(handler);
 		}
 
-		public void OnEvents<T>(Func<OrderedEventPayload[], Task> handler)
-		{
-			var eventType = typeof(T);
-
-			if (!_eventCollectionHandlers.ContainsKey(eventType))
-				_eventCollectionHandlers.Add(eventType, new List<Func<OrderedEventPayload[], Task>>());
-
-			_eventCollectionHandlers[eventType].Add(handler);
-		}
-
 		public async Task Handle(OrderedEventPayload @event)
 		{
 			var eventType = @event.EventPayload.GetType();
@@ -45,24 +34,6 @@ namespace EventWay.Core
 
 			foreach (var handler in _eventHandlers[eventType])
 				await handler(@event);
-		}
-
-		public async Task Handle(OrderedEventPayload[] @events)
-		{
-			var groupEvents = @events.GroupBy(p => p.EventPayload.GetType());
-			foreach (var groupEvent in groupEvents)
-			{
-				var eventType = groupEvent.Key;
-				var eventPayloads = groupEvent.ToArray();
-				if (!_eventCollectionHandlers.ContainsKey(eventType))
-				{
-					Console.WriteLine($"Received unhandled event: {eventType.AssemblyQualifiedName}");
-					return;
-				}
-
-				foreach (var handler in _eventCollectionHandlers[eventType])
-					await handler(eventPayloads);
-			}
 		}
 	}
 }
