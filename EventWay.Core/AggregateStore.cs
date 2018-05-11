@@ -5,10 +5,10 @@ namespace EventWay.Core
 {
 	public class AggregateStore : IAggregateStore
 	{
-		private readonly IAggregateRepository _aggregateRepository;
-		private readonly IAggregateTracking _aggregateTracking;
-		private readonly IEventListener _eventListener;
-	    private readonly IAggregateCache _aggregateCache;
+		protected readonly IAggregateRepository _aggregateRepository;
+	    protected readonly IAggregateTracking _aggregateTracking;
+	    protected readonly IEventListener _eventListener;
+	    protected readonly IAggregateCache _aggregateCache;
 
         public AggregateStore(
 		    IAggregateRepository aggregateRepository, 

@@ -8,6 +8,7 @@ using EventWay.Infrastructure.MsSql;
 using EventWay.SampleApp.Application;
 using EventWay.SampleApp.Application.Projections;
 using EventWay.SampleApp.Application.QueryModels;
+using EventWay.VanDa;
 
 namespace EventWay.SampleApp
 {
@@ -17,14 +18,14 @@ namespace EventWay.SampleApp
         {
             var app = new SampleApp();
 
-            app.Initialize();
+            app.InitializeVanDa();
             app.Run().Wait();
         }
     }
 
     class SampleApp
     {
-        private UserApplicationService UserApplicationService { get; set; }
+        private IUserApplicationService UserApplicationService { get; set; }
         private UserProjection UserProjection { get; set; }
 
         public async Task Run()
@@ -46,6 +47,61 @@ namespace EventWay.SampleApp
 
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
+        }
+
+        public void InitializeVanDa()
+        {
+            // Configuration Parameters
+            var eventDatabaseConnectionString = "Data Source=localhost;Initial Catalog=eventway;Integrated Security=True;Connect Timeout=15;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+            var projectionMetadataDatabaseConnectionString = eventDatabaseConnectionString;
+
+            var cosmosDbEndpoint = "https://localhost:8081"; // This is the default endpoint for local emulator-instances of the Cosmos DB
+            var cosmosDbAuthKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
+            var cosmosDbDatabaseId = "eventway";
+            var cosmosDbCollectionId = "projections";
+            var offerThroughput = 10000;
+            var noOfPartitions = 1000;
+
+            // Event Repository
+            var eventRepository = new SqlServerEventRepository(eventDatabaseConnectionString);
+
+            // Projection Metadata Repository
+            var projectionMetadataRepository = new SqlServerProjectionMetadataRepository(projectionMetadataDatabaseConnectionString);
+
+            // Query Model Repository
+            var queryModelRepository = new CosmosDbQueryModelRepository(
+                cosmosDbDatabaseId, 
+                cosmosDbCollectionId,
+                offerThroughput, 
+                noOfPartitions, 
+                cosmosDbEndpoint, 
+                cosmosDbAuthKey);
+            queryModelRepository.Initialize();
+
+            var vandaQueryModelRepository = new VanDaCosmosDbQueryModelRepository(queryModelRepository);
+
+            // Event Listener
+            var eventListener = new VanDaEventListener();
+
+            // Aggregate services
+            var aggregateFactory = new DefaultAggregateFactory();
+            var aggregateRepository = new AggregateRepository(eventRepository, aggregateFactory);
+            var aggregateStore = new VanDaAggregateStore(aggregateRepository, eventListener);
+
+            // PROJECTIONS
+            UserProjection = new UserProjection(
+                eventRepository,
+                eventListener,
+                vandaQueryModelRepository,
+                projectionMetadataRepository);
+
+            // APPLICATION SERVICES
+            UserApplicationService = new VanDaUserApplicationService(
+                aggregateStore,
+                vandaQueryModelRepository);
+
+            // Start listening for events
+            UserProjection.Listen();
         }
 
         public void Initialize()

@@ -4,14 +4,15 @@ using EventWay.Core;
 using EventWay.Query;
 using EventWay.SampleApp.Application.QueryModels;
 using EventWay.SampleApp.Core;
+using EventWay.VanDa;
 
 namespace EventWay.SampleApp.Application
 {
-    public class UserApplicationService : IUserApplicationService
+    public class VanDaUserApplicationService : IUserApplicationService
     {
-        public UserApplicationService(
-            IAggregateStore aggregateStore,
-            IQueryModelRepository queryModelRepository)
+        public VanDaUserApplicationService(
+            IExtendedAggregateStore aggregateStore,
+            IExtendedQueryModelRepository queryModelRepository)
         {
             _aggregateStore = aggregateStore ?? throw new ArgumentNullException(nameof(aggregateStore));
             _queryModelRepository = queryModelRepository ?? throw new ArgumentNullException(nameof(queryModelRepository));

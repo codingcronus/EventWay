@@ -41,10 +41,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\RegisterUser.cs" />
+    <Compile Include="IUserApplicationService.cs" />
     <Compile Include="Projections\UserProjection.cs" />
     <Compile Include="QueryModels\UserQueryModel.cs" />
     <Compile Include="UserApplicationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VanDaUserApplicationService.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -59,6 +61,10 @@
     <ProjectReference Include="..\EventWay.SampleApp.Core\EventWay.SampleApp.Core.csproj">
       <Project>{E26F7E24-9964-434C-B38D-A9C863534D66}</Project>
       <Name>EventWay.SampleApp.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EventWay.VanDa\EventWay.VanDa.csproj">
+      <Project>{139DC2B1-1004-4D28-9A2D-9346642FEFED}</Project>
+      <Name>EventWay.VanDa</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

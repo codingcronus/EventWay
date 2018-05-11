@@ -1,20 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{25C06E5E-A855-4762-883B-147F871061FE}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{139DC2B1-1004-4D28-9A2D-9346642FEFED}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>EventWay.SampleApp</RootNamespace>
-    <AssemblyName>EventWay.SampleApp</AssemblyName>
+    <RootNamespace>EventWay.VanDa</RootNamespace>
+    <AssemblyName>EventWay.VanDa</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +25,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -33,7 +33,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Azure.Documents.Client, Version=1.21.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+    <Reference Include="Microsoft.Azure.Documents.Client, Version=1.21.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Azure.DocumentDB.1.21.1\lib\net45\Microsoft.Azure.Documents.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -44,58 +49,38 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExtendedCosmosDbQueryModelRepository.cs" />
+    <Compile Include="IExtendedAggregateStore.cs" />
+    <Compile Include="IExtendedEventListener.cs" />
     <Compile Include="IExtendedQueryModelRepository.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="VanDaAggregateStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
+    <Compile Include="VanDaCosmosDbQueryModelRepository.cs" />
+    <Compile Include="VanDaEventListener.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EventWay.Core\EventWay.Core.csproj">
       <Project>{E9944AB9-0D72-49EF-8D1A-21518A3F3CFB}</Project>
       <Name>EventWay.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\EventWay.Infrastructure.ApplicationInsights\EventWay.Infrastructure.ApplicationInsights.csproj">
-      <Project>{96BECF10-D1D7-4B80-B982-63BA620124B8}</Project>
-      <Name>EventWay.Infrastructure.ApplicationInsights</Name>
-    </ProjectReference>
     <ProjectReference Include="..\EventWay.Infrastructure.CosmosDb\EventWay.Infrastructure.CosmosDb.csproj">
       <Project>{249FB03C-F3D8-4FBF-8270-98EFB68BF6B2}</Project>
       <Name>EventWay.Infrastructure.CosmosDb</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EventWay.Infrastructure.MsSql\EventWay.Infrastructure.MsSql.csproj">
-      <Project>{E65693A1-5BE8-41C2-970E-4D9F48433B9A}</Project>
-      <Name>EventWay.Infrastructure.MsSql</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EventWay.Infrastructure\EventWay.Infrastructure.csproj">
-      <Project>{72BD6C9C-6C0C-421B-932A-003DA6F4F9F9}</Project>
-      <Name>EventWay.Infrastructure</Name>
     </ProjectReference>
     <ProjectReference Include="..\EventWay.Query\EventWay.Query.csproj">
       <Project>{CB22E7A6-62DB-4BF0-B9CD-A936A04BE0C3}</Project>
       <Name>EventWay.Query</Name>
     </ProjectReference>
-    <ProjectReference Include="..\EventWay.SampleApp.Application\EventWay.SampleApp.Application.csproj">
-      <Project>{81A3910E-BD8D-4AC3-889D-5DBD11E61EC0}</Project>
-      <Name>EventWay.SampleApp.Application</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EventWay.SampleApp.Core\EventWay.SampleApp.Core.csproj">
-      <Project>{E26F7E24-9964-434C-B38D-A9C863534D66}</Project>
-      <Name>EventWay.SampleApp.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EventWay.VanDa\EventWay.VanDa.csproj">
-      <Project>{139DC2B1-1004-4D28-9A2D-9346642FEFED}</Project>
-      <Name>EventWay.VanDa</Name>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
+  <Import Project="..\packages\Microsoft.Azure.DocumentDB.1.21.1\build\Microsoft.Azure.DocumentDB.targets" Condition="Exists('..\packages\Microsoft.Azure.DocumentDB.1.21.1\build\Microsoft.Azure.DocumentDB.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Azure.DocumentDB.1.21.1\build\Microsoft.Azure.DocumentDB.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Azure.DocumentDB.1.21.1\build\Microsoft.Azure.DocumentDB.targets'))" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

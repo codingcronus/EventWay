@@ -7,12 +7,10 @@ namespace EventWay.Core
 	public class BasicEventListener : IEventListener
 	{
 		private readonly Dictionary<Type, List<Func<OrderedEventPayload, Task>>> _eventHandlers;
-		private readonly Dictionary<Type, List<Func<OrderedEventPayload[], Task>>> _eventCollectionHandlers;
 
 		public BasicEventListener()
 		{
 			_eventHandlers = new Dictionary<Type, List<Func<OrderedEventPayload, Task>>>();
-			_eventCollectionHandlers = new Dictionary<Type, List<Func<OrderedEventPayload[], Task>>>();
 		}
 
 		public void OnEvent<T>(Func<OrderedEventPayload, Task> handler)
